@@ -1,7 +1,7 @@
 # Family Budget Tracker — Analysis & Requirements
 
 **Author:** Nuray Mukhambet — Systems Analysis & Requirements
-**Course:** Basics of Information Systems · **Version:** 1.1 · **Date:** 2026-11-05
+**Course:** Basics of Information Systems · **Version:** 1.2 · **Date:** 2026-11-05
 
 This folder contains the systems analysis of the Family Budget Tracker: what the system must do, for whom, under which rules, and with which data. All other parts of the project (architecture, database, application, tests) are built from these documents.
 
@@ -20,6 +20,7 @@ This folder contains the systems analysis of the Family Budget Tracker: what the
 | 07 | [Data Dictionary](07-data-dictionary.md) | 13 entities, attributes, constraints, enums, sample data |
 | 08 | [Traceability Matrix](08-traceability-matrix.md) | Requirement → use case → story → rule → entity → owner → test |
 | 09 | [Glossary](09-glossary.md) | Definitions of all domain terms |
+| 10 | [Architecture and Security](10-architecture-and-security.md) | Stack, RBAC, sessions, invitation and reset tokens (owner: Nuradin Alinur) |
 
 ## Diagrams
 
@@ -33,6 +34,7 @@ GitHub renders these automatically (Mermaid).
 | Activity diagram: record a transaction | [diagrams/activity-record-transaction.md](diagrams/activity-record-transaction.md) |
 | State diagrams: invitation, budget, savings goal | [diagrams/state-diagrams.md](diagrams/state-diagrams.md) |
 | Entity-relationship diagram | [diagrams/erd.md](diagrams/erd.md) |
+| System architecture | [diagrams/architecture.md](diagrams/architecture.md) |
 
 ## How these documents feed the team
 
@@ -49,3 +51,4 @@ GitHub renders these automatically (Mermaid).
 |---|---|---|---|
 | 1.0 | 2026-11-05 | Nuray Mukhambet | First complete version for team review |
 | 1.1 | 2026-11-05 | Nuray Mukhambet | Resolved open questions D-1 – D-4: refunds as INCOME (BR-28), no family total for children, in-app notifications only (FR-36 → Won't, invitation links, admin password reset), PostgreSQL |
+| 1.2 | 2026-11-05 | Nuray Mukhambet | Added doc 10 v1.0 (Architecture & Security), aligned to v1.1: Child reports 🔸 own data, EXPIRED invitation status, UC-02 error message, FR-04 in known limit. Invitation token stored as SHA-256 hash (doc 07 v1.2); resend creates a new link (state diagram) |
