@@ -110,7 +110,7 @@ The link has the form `https://<site>/invite/<token>` and `https://<site>/reset/
 | # | Question | Who decides |
 |---|---|---|
 | 1 | Confirm the stack in section 1 | Aziza, Nuradin |
-| 2 | Doc 07 says `INVITATION.token` is "random secret in the link". Section 5 stores its SHA-256 hash instead. It fits varchar(64), so no schema change, but doc 07 should say so. | Gulnaz, Nuray |
+| 2 | Doc 07 says `INVITATION.token` is "random secret in the link". Section 5 stores its SHA-256 hash instead. It fits varchar(64), so no schema change, but doc 07 should say so. **Resolved in doc 07 v1.2.** | Gulnaz, Nuray |
 | 3 | NFR-07 needs proof that the user accepted the privacy notice. A column such as `privacy_accepted_at` in USER may be needed. | Gulnaz, Nuray |
 | 4 | Password minimum length (section 4) | Team |
 
