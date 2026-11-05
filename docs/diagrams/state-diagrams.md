@@ -10,7 +10,7 @@ stateDiagram-v2
     Pending --> Accepted : Invitee accepts within 7 days
     Pending --> Declined : Invitee declines
     Pending --> Expired : 7 days pass
-    Pending --> Pending : Owner resends (new expiry date)
+    Pending --> Pending : Owner creates a new link (old link stops working, new expiry date)
     Accepted --> [*]
     Declined --> [*]
     Expired --> [*]

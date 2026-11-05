@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Document owner** | Nuradin Alinur — Architecture & Security |
-| **Version** | 1.0 (draft for team review) |
+| **Version** | 1.1 (draft for team review) |
 | **Date** | 2026-11-05 |
 
 This document covers three things: the technology stack and components, how access control works (from the permission matrix in doc 02 §3), and how logins, sessions and tokens work (NFR-01 – NFR-07, FR-03, FR-06). The diagram is in [diagrams/architecture.md](diagrams/architecture.md).
@@ -58,7 +58,8 @@ One table in code, one place to change. Conditions are checked after the role.
 | Record TRANSFER | ✅ | ✅ | ❌ | ❌ | |
 | Edit / delete transaction | ✅ any | 🔸 | ❌ | ❌ | Adult: only if `created_by` is the user (BR-11) |
 | Categories, recurring rules, budgets, goals | ✅ | ✅ | ❌ | ❌ | |
-| Family reports, family total balance | ✅ | ✅ | ❌ | ❌ | Child sees only own data, never the total (D-2) |
+| Reports (own data) | ✅ | ✅ | 🔸 | ❌ | Child: only own transactions on shared accounts |
+| Family reports, family total balance | ✅ | ✅ | ❌ | ❌ | Never shown to a Child (D-2, BR-13) |
 | Export CSV | ✅ | ✅ | ❌ | ❌ | |
 | View audit log | ✅ own family | ❌ | ❌ | 🔸 | Admin: metadata only, no transaction content |
 | Block / unblock user, create reset link | ❌ | ❌ | ❌ | ✅ | |
@@ -84,7 +85,7 @@ One table in code, one place to change. Conditions are checked after the role.
 | Secrets | Signing key and database password come from environment variables. `.env` is never committed. | CLAUDE.md |
 | Personal data | A privacy notice must be accepted at registration. | NFR-07 |
 
-**Known limit of v1:** a signed token cannot be cancelled before it expires. After a password reset, an old token can still work for up to 30 minutes. For a student project this is acceptable. A server-side sessions table would fix it, but needs a new table.
+**Known limit of v1:** a signed token cannot be cancelled before it expires. After a password change (FR-04), an old token can still work for up to 30 minutes. For a student project this is acceptable. A server-side sessions table would fix it, but needs a new table.
 
 ## 5. Tokens: invitation links and password-reset links
 
@@ -96,11 +97,11 @@ Both tokens are random secrets. They are shown **once** and only a **hash** is k
 | Token | 32 random bytes, URL-safe (`secrets.token_urlsafe(32)`) | same |
 | Stored as | SHA-256 hex (64 chars) in `INVITATION.token` (varchar(64), UQ) | SHA-256 hex in `USER.reset_token_hash` |
 | Valid for | 7 days (`expires_at`) | 24 hours (`reset_token_expires_at`) |
-| Use | Single use: status `PENDING` → `ACCEPTED` or `DECLINED` | Single use: hash and expiry are cleared after the password is changed |
+| Use | Single use: status `PENDING` → `ACCEPTED`, `DECLINED` or `EXPIRED` (after 7 days) | Single use: hash and expiry are cleared after the password is changed |
 | Who may use it | Only a logged-in user whose email equals the invited email (case-insensitive). Anyone else sees "This invitation was sent to another email address". Accepting also checks BR-17 (one family per user). | Anyone with the link, because the user cannot log in. That is why it is shown only to the admin and passed on outside the system. |
 | New link | One pending invitation per email and family; a new one replaces the old one (BR-19) | A new link replaces the old one |
 | Effects | Audit entry; notification to the Owner (INVITE_ACCEPTED / INVITE_DECLINED) | Audit entry; `failed_login_count` and `locked_until` are reset |
-| Errors | Expired, used or unknown token: the same message "This link is not valid or has expired" | same |
+| Errors | Expired invitation: "This invitation has expired, ask the family owner for a new one" (UC-02, 6a). Used or unknown token: "This link is not valid or has expired". | Expired, used or unknown token: "This link is not valid or has expired" |
 
 The link has the form `https://<site>/invite/<token>` and `https://<site>/reset/<token>`. Tokens must never be written to logs. Attempts on the token pages are rate-limited, for example 10 per minute per IP address.
 
@@ -109,7 +110,7 @@ The link has the form `https://<site>/invite/<token>` and `https://<site>/reset/
 | # | Question | Who decides |
 |---|---|---|
 | 1 | Confirm the stack in section 1 | Aziza, Nuradin |
-| 2 | Doc 07 says `INVITATION.token` is "random secret in the link". Section 5 stores its SHA-256 hash instead. It fits varchar(64), so no schema change, but doc 07 should say so. | Gulnaz, Nuray |
+| 2 | Doc 07 says `INVITATION.token` is "random secret in the link". Section 5 stores its SHA-256 hash instead. It fits varchar(64), so no schema change, but doc 07 should say so. **Resolved in doc 07 v1.2.** | Gulnaz, Nuray |
 | 3 | NFR-07 needs proof that the user accepted the privacy notice. A column such as `privacy_accepted_at` in USER may be needed. | Gulnaz, Nuray |
 | 4 | Password minimum length (section 4) | Team |
 
