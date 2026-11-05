@@ -4,7 +4,7 @@
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
 | **Handed over to** | Gulnaz Bekturgan — Data & Database (physical design, SQL schema) |
-| **Version** | 1.1 |
+| **Version** | 1.2 |
 | **Date** | 2026-11-05 |
 
 This is the **logical** data model derived from the requirements. The database engine is **PostgreSQL** (decision D-4), so types are given as PostgreSQL types. Data & Database decides the remaining physical details (indexes, naming, migrations). The ER diagram is in [diagrams/erd.md](diagrams/erd.md).
@@ -92,7 +92,7 @@ This is the **logical** data model derived from the requirements. The database e
 | family_id | integer | FK → FAMILY, NN | |
 | email | varchar(255) | NN | Invited address |
 | role | member_role | NN, CHECK ≠ OWNER | Role given on acceptance |
-| token | varchar(64) | NN, UQ | Random secret in the link |
+| token | varchar(64) | NN, UQ | SHA-256 hash (hex) of the secret in the link; the secret itself is never stored (doc 10 §5) |
 | invited_by | integer | FK → FAMILY_MEMBER, NN | |
 | status | invitation_status | NN, default PENDING | |
 | expires_at | timestamptz | NN | created + 7 days (BR-19) |
