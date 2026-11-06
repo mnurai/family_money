@@ -1,8 +1,4 @@
-"""First automated test: the worked example of doc 06 (balances, budgets, reports).
 
-Every step is checked against the table in doc 06 / doc 11 §9.
-Markers `tc(...)` link tests to the traceability matrix (see scripts/update_traceability.py).
-"""
 import random
 from decimal import Decimal as D
 
