@@ -58,6 +58,7 @@ Reference requirement and rule IDs (FR-xx, NFR-xx, BR-xx, US-xx) in code comment
 ## Stack and commands
 
 > Backend: Python + FastAPI, SQLAlchemy 2, psycopg, pytest (see `requirements.txt`). Details: `docs/10-architecture-and-security.md`.
+> Frontend: React + TypeScript + Vite in `frontend/`, money as integer tiyn. Until the API exists it runs on an in-browser demo API (`frontend/README.md`).
 
 ```bash
 pip install -r requirements.txt   # install dependencies
@@ -65,6 +66,12 @@ pip install -r requirements.txt   # install dependencies
 python -m pytest                  # run tests (from the repository root)
 # run linter/formatter:   TODO
 # apply DB migrations:    TODO
+
+cd frontend
+npm install                       # web app dependencies
+npm run dev                       # web app on http://localhost:5173
+npm test                          # web app unit tests
+npm run build                     # type check + production build
 ```
 
 ## Code and testing conventions
