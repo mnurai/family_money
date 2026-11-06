@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.2 |
+| **Version** | 1.3 |
 | **Date** | 2026-11-06 |
 
 The use case diagram is in [diagrams/use-case-diagram.md](diagrams/use-case-diagram.md).
@@ -204,7 +204,7 @@ The use case diagram is in [diagrams/use-case-diagram.md](diagrams/use-case-diag
 **Main flow**
 1. System finds the budget for the transaction's category (or its parent) and month.
 2. System calculates the percentage used (BR-15).
-3. If the percentage crossed 80 % or 100 % and that alert has not yet been sent (BR-16), the system creates a notification for the Owner and all Adults.
+3. If the percentage crossed 80 % or 100 % and that alert has not yet been sent (BR-16), the system creates a notification for the Owner and all Adults. If both thresholds were crossed at once, only the 100 % notification is created and both are marked as sent.
 4. System updates the stored alert state of the budget.
 
 **Alternative flow**
@@ -216,7 +216,7 @@ The use case diagram is in [diagrams/use-case-diagram.md](diagrams/use-case-diag
 
 | | |
 |---|---|
-| **Primary actor** | Any member (Child: own data only) |
+| **Primary actor** | Any member (Child: shared accounts only, BR-10) |
 
 **Main flow**
 1. Actor opens "Reports" and selects a period (default: current month).
@@ -260,7 +260,9 @@ The use case diagram is in [diagrams/use-case-diagram.md](diagrams/use-case-diag
 5. System notifies the rule creator ("Rent 150 000 ₸ recorded").
 
 **Alternative flow**
+- 2a. Job did not run for several days (downtime) → steps 3–4 repeat for a rule until its `next_run_date` is after today, oldest date first (BR-26).
 - 3a. Validation fails (BR-08) → transaction is skipped, creator is notified ("Rent could not be recorded: not enough money on Kaspi card"), step 4 still runs (BR-26).
+- 3b. Job runs a second time on the same day → no rule has `next_run_date ≤ today` any more, so nothing is created twice (BR-26).
 
 ---
 

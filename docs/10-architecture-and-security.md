@@ -58,7 +58,7 @@ One table in code, one place to change. Conditions are checked after the role.
 | Record TRANSFER | ✅ | ✅ | ❌ | ❌ | |
 | Edit / delete transaction | ✅ any | 🔸 | ❌ | ❌ | Adult: only if `created_by` is the user (BR-11) |
 | Categories, recurring rules, budgets, goals | ✅ | ✅ | ❌ | ❌ | |
-| Reports (own data) | ✅ | ✅ | 🔸 | ❌ | Child: only own transactions on shared accounts |
+| Reports (own data) | ✅ | ✅ | 🔸 | ❌ | Child: all transactions on shared accounts (BR-10) |
 | Family reports, family total balance | ✅ | ✅ | ❌ | ❌ | Never shown to a Child (D-2, BR-13) |
 | Export CSV | ✅ | ✅ | ❌ | ❌ | |
 | View audit log | ✅ own family | ❌ | ❌ | 🔸 | Admin: metadata only, no transaction content |
@@ -66,7 +66,7 @@ One table in code, one place to change. Conditions are checked after the role.
 
 ### 3.3 Rules that are easy to forget
 
-- **Child and accounts:** besides the role, the server checks ACCOUNT_ACCESS for the account used in the request. This applies to listing accounts, recording a transaction, and reading reports (a child's report contains only their own transactions).
+- **Child and accounts:** besides the role, the server checks ACCOUNT_ACCESS for the account used in the request. This applies to listing accounts, recording a transaction, and reading reports (a child's report contains all transactions on their shared accounts, BR-10).
 - **System Administrator** is a flag on the user (`is_system_admin`), not a family role. Admin endpoints are separate from family endpoints, and the admin has no access to transaction content (privacy).
 - **Blocked users:** `is_active` is read from the database on every request, so a block works immediately, not after the session ends.
 - **Audit log** is append-only (BR-27): the application account in PostgreSQL gets INSERT and SELECT on it, but not UPDATE or DELETE.
@@ -76,7 +76,7 @@ One table in code, one place to change. Conditions are checked after the role.
 | Topic | Design | Requirement |
 |---|---|---|
 | Password storage | Argon2id or bcrypt hash with salt. Plain passwords are never stored or written to logs. | NFR-01 |
-| Password rule | At least 8 characters (proposal; not yet in the requirements). | — |
+| Password rule | At least 8 characters with at least one letter and one digit (UC-01 step 2, US-01.3). | FR-01 |
 | Login | Email (stored lower-case) + password. A wrong email and a wrong password give the same message: "Email or password is incorrect". | FR-02 |
 | Lock-out | After 5 failed attempts `locked_until = now + 15 minutes`. A successful login resets `failed_login_count`. While locked, even the correct password is refused. Both columns already exist in USER. | NFR-06 |
 | Session | A signed token (JWT) in an `HttpOnly`, `Secure`, `SameSite=Lax` cookie, valid 30 minutes. On every request the server issues a fresh one, so it expires after 30 minutes of **inactivity**. | NFR-05 |

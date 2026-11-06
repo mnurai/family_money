@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.1 |
-| **Date** | 2026-11-05 |
+| **Version** | 1.2 |
+| **Date** | 2026-11-06 |
 
 Business rules are constraints that the system must always respect, no matter which screen or API is used. Each rule should be enforced in the backend (Application & Development), where possible also as a database constraint (Data & Database), and verified by at least one test case (Testing).
 
@@ -23,7 +23,7 @@ Business rules are constraints that the system must always respect, no matter wh
 | BR-07 | **Account balance** = opening balance + Σ INCOME to the account + Σ TRANSFER into the account − Σ EXPENSE from the account − Σ TRANSFER out of the account. Deleted transactions are not counted. | APP (or DB view) |
 | BR-08 | A Cash, Bank card or Savings account may not go below 0 as a result of an expense or transfer. A Credit card account may not go below −(credit limit). | APP |
 | BR-09 | The transaction date cannot be later than today. (Future movements are planned with recurring rules instead.) | APP + UI |
-| BR-10 | A Child Member can record only `INCOME` and `EXPENSE`, and only on accounts shared with them. A child sees only those accounts and their own transactions. | APP |
+| BR-10 | A Child Member can record only `INCOME` and `EXPENSE`, and only on accounts shared with them. A child sees only those accounts and **all** transactions on them, including ones recorded by other members, so that the list adds up to the balance (BR-07). | APP |
 | BR-11 | Only the creator of a transaction or the Owner may edit or delete it; Children cannot edit or delete. Every edit is validated again against BR-01 … BR-10. Deletion is soft (`is_deleted = true`). | APP |
 
 ## 2. Reports
@@ -39,7 +39,7 @@ Business rules are constraints that the system must always respect, no matter wh
 |---|---|---|
 | BR-14 | A budget can be set only for an **expense** category, for one calendar month, with a limit > 0. There is at most one budget per category per month per family. | DB (UNIQUE) + APP |
 | BR-15 | Amount spent for a budget = Σ of non-deleted `EXPENSE` transactions in that category **and its subcategories** with a date inside that month. INCOME and TRANSFER never affect budgets. | APP |
-| BR-16 | An alert is generated once when spent ≥ 80 % of the limit and once when spent ≥ 100 %. Budget status is recalculated whenever an expense is created, edited or deleted. If editing brings spending below a threshold, the alert can fire again later. | APP |
+| BR-16 | An alert is generated once when spent ≥ 80 % of the limit and once when spent ≥ 100 %. Budget status is recalculated whenever an expense is created, edited or deleted. If editing brings spending below a threshold, the alert can fire again later. If one expense crosses **both** thresholds at once (e.g. 70 % → 105 %), both are marked as sent but only **one** notification is created: "Budget exceeded" (`BUDGET_100`). | APP |
 
 ## 4. Families, members, invitations
 
@@ -64,7 +64,7 @@ Business rules are constraints that the system must always respect, no matter wh
 | ID | Rule | Enforcement |
 |---|---|---|
 | BR-25 | A savings goal is linked to exactly one account of type Savings, and an account can have at most one goal. Progress = account balance ÷ target amount. Money is added to a goal by a TRANSFER (or INCOME) into the linked account — it is **not** an expense. | DB (UNIQUE) + APP |
-| BR-26 | On its due date, a recurring rule creates a normal transaction. If the transaction would break BR-08, it is skipped and the creator is notified. In both cases the next due date moves forward by one period. | APP |
+| BR-26 | On its due date, a recurring rule creates a normal transaction. If the transaction would break BR-08, it is skipped and the creator is notified. In both cases the next due date moves forward by one period. The job is **idempotent**: a rule never creates two transactions for the same due date, even if the job runs twice. After downtime the job catches up: it processes every missed due date of a rule in date order, each with that date as the transaction date. | APP |
 
 ## 7. Audit
 

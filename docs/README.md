@@ -1,7 +1,7 @@
 # Family Budget Tracker — Analysis & Requirements
 
 **Author:** Nuray Mukhambet — Systems Analysis & Requirements
-**Course:** Basics of Information Systems · **Version:** 1.3 · **Date:** 2026-11-06
+**Course:** Basics of Information Systems · **Version:** 1.4 · **Date:** 2026-11-06
 
 This folder contains the systems analysis of the Family Budget Tracker: what the system must do, for whom, under which rules, and with which data. All other parts of the project (architecture, database, application, tests) are built from these documents.
 
@@ -15,7 +15,7 @@ This folder contains the systems analysis of the Family Budget Tracker: what the
 | 02 | [Stakeholders and Users](02-stakeholders-and-users.md) | Roles, permission matrix, personas |
 | 03 | [Requirements Specification](03-requirements.md) | 38 functional (+ 4 Won't) and 20 non-functional requirements with MoSCoW priorities |
 | 04 | [Use Cases](04-use-cases.md) | 12 use cases with main and alternative flows |
-| 05 | [User Stories](05-user-stories.md) | 20 user stories with Given/When/Then acceptance criteria |
+| 05 | [User Stories](05-user-stories.md) | 26 user stories with Given/When/Then acceptance criteria |
 | 06 | [Business Rules](06-business-rules.md) | 28 rules + worked numeric example |
 | 07 | [Data Dictionary](07-data-dictionary.md) | 13 entities, attributes, constraints, enums, sample data |
 | 08 | [Traceability Matrix](08-traceability-matrix.md) | Requirement → use case → story → rule → entity → owner → test |
@@ -53,3 +53,4 @@ GitHub renders these automatically (Mermaid).
 | 1.1 | 2026-11-05 | Nuray Mukhambet | Resolved open questions D-1 – D-4: refunds as INCOME (BR-28), no family total for children, in-app notifications only (FR-36 → Won't, invitation links, admin password reset), PostgreSQL |
 | 1.2 | 2026-11-05 | Nuray Mukhambet | Added doc 10 v1.0 (Architecture & Security), aligned to v1.1: Child reports 🔸 own data, EXPIRED invitation status, UC-02 error message, FR-04 in known limit. Invitation token stored as SHA-256 hash (doc 07 v1.2); resend creates a new link (state diagram) |
 | 1.3 | 2026-11-06 | Nuray Mukhambet | Resolved test-plan findings I-2, I-3, I-5 (doc 11 §10): login error text aligned with doc 10 (US-02.2); existing pending invitation gets a new link instead of the old one, which cannot be shown again (UC-02 3a, US-04.5); budget alerts go to Owner and Adults only (FR-26, US-15). Docs 03, 04, 05 → v1.2 |
+| 1.4 | 2026-11-06 | Nuray Mukhambet | Resolved test-plan findings I-1, I-4, I-6, I-7, I-10, I-11, I-13 (doc 11 §10): password ≥ 8 with a letter and a digit (US-01.3, doc 10); a Child sees all transactions on shared accounts (BR-10, doc 02, UC-09, US-18, doc 10); scheduler idempotent with catch-up (BR-26, UC-11); one "exceeded" alert when both thresholds are crossed (BR-16, UC-08, US-15); CSV number format (US-19); new stories US-21 – US-26 for FR-04, FR-09, FR-15, FR-27, FR-33, FR-38 (doc 08, create_issues.sh). Docs 02, 06, 08 → v1.2; docs 04, 05 → v1.3 |
