@@ -1,21 +1,4 @@
-#!/usr/bin/env python3
-"""Update the Status column of the traceability matrix (doc 08) from a JUnit XML report.
 
-    pytest --junitxml=report.xml
-    python scripts/update_traceability.py report.xml 08-traceability-matrix.md 11-test-plan-and-test-cases.md [--dry-run]
-(a run against the built-in reference model is refused; see tests/conftest.py)
-
-How a status is decided for a matrix test case, e.g. TC-30:
-  * the sub-cases of TC-30 (TC-30.1, TC-30.2 ...) are read from doc 11;
-  * a sub-case is *passed* when at least one test marked @pytest.mark.tc("TC-30.1") ran
-    and every such test passed; it is *failed* when any such test failed or errored;
-  * TC-30 becomes  ❌ if any sub-case failed,
-                   ✅ only if ALL its sub-cases passed,
-                   🟨 if some, but not all, passed (work in progress),
-                   unchanged if no test ran for it (a missing run never changes a status).
-  * Manual test cases are not in the XML: set their status by hand in doc 08.
-Tests marked with the parent ID (tc("TC-30")) count for all its sub-cases.
-"""
 import re
 import sys
 import xml.etree.ElementTree as ET
