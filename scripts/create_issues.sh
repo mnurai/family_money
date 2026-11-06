@@ -38,6 +38,12 @@ stories=(
 "US-18|Expenses by category and by member|must-have|epic:E4-reports|FR-31, FR-32|UC-09"
 "US-19|Export transactions to CSV|could-have|epic:E4-reports|FR-34|UC-09"
 "US-20|Block users and generate password-reset links (system admin)|should-have|epic:E5-admin|FR-03, FR-39|UC-12"
+"US-21|Edit my profile (name, password)|should-have|epic:E1-accounts-family|FR-04, NFR-01|—"
+"US-22|Transfer ownership to an adult|could-have|epic:E1-accounts-family|FR-09|—"
+"US-23|Custom categories and subcategories|should-have|epic:E1-accounts-family|FR-15|—"
+"US-24|Copy budgets to next month|could-have|epic:E3-budgets-goals|FR-27|UC-07"
+"US-25|Balance history of an account|could-have|epic:E4-reports|FR-33|UC-09"
+"US-26|View the family audit log|could-have|epic:E5-admin|FR-38|—"
 )
 
 for s in "${stories[@]}"; do

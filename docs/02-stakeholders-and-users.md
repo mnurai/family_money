@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.1 |
-| **Date** | 2026-11-05 |
+| **Version** | 1.2 |
+| **Date** | 2026-11-06 |
 
 ## 1. Stakeholders
 
@@ -39,7 +39,7 @@ A child or teenager invited by the Owner.
 - Sees **only** the accounts the Owner has shared with them (e.g. "Aidar's pocket money")
 - Records income and expenses on those accounts only
 - Cannot record transfers, cannot delete transactions, cannot manage budgets, members or accounts
-- Sees their own spending report
+- Sees all transactions on the shared accounts (also those recorded by parents) and a report for those accounts only
 
 ### 2.4 System Administrator
 Platform-level role, not part of any family.
@@ -74,7 +74,7 @@ Platform-level role, not part of any family.
 | Create recurring transaction | ✅ | ✅ | ❌ | ❌ |
 | Set budgets | ✅ | ✅ | ❌ | ❌ |
 | Create savings goal | ✅ | ✅ | ❌ | ❌ |
-| View family reports | ✅ | ✅ | 🔸 own data only | ❌ |
+| View family reports | ✅ | ✅ | 🔸 shared accounts only | ❌ |
 | Export CSV | ✅ | ✅ | ❌ | ❌ |
 | View audit log | ✅ (own family) | ❌ | ❌ | ✅ (metadata only) |
 | Block / unblock users | ❌ | ❌ | ❌ | ✅ |

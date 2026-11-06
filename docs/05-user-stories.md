@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.2 |
+| **Version** | 1.3 |
 | **Date** | 2026-11-06 |
 
 Format: *As a ⟨role⟩, I want ⟨goal⟩, so that ⟨benefit⟩.* Acceptance criteria use **Given / When / Then** so that the Testing role can turn them directly into test cases. Each story is also created as a GitHub Issue (see `scripts/create_issues.sh`).
@@ -18,7 +18,7 @@ Story points: 1 = a few hours, 2 = about a day, 3 = 2–3 days, 5 = a week.
 - **Acceptance criteria**
   1. Given a new email and a valid password, when I submit the form, then my account is created and I am logged in.
   2. Given an email that already exists, when I submit, then I see "An account with this email already exists".
-  3. Given a password shorter than 8 characters or without a digit, when I submit, then I see the password rules and no account is created.
+  3. Given a password shorter than 8 characters, or without at least one letter and one digit, when I submit, then I see the password rules and no account is created.
   4. The password is stored only as a hash.
 
 ### US-02 — Log in and out
@@ -73,6 +73,30 @@ Story points: 1 = a few hours, 2 = about a day, 3 = 2–3 days, 5 = a week.
   1. Given I share "Aidar — pocket money" with Aidar, when Aidar logs in, then he sees only that account.
   2. Aidar can record income and expenses on it but has no "Transfer" option.
   3. A direct API request by Aidar to another account returns 403.
+
+### US-21 — Edit my profile
+*As a user, I want to change my name and password, so that my account stays correct and secure.*
+- **Links:** FR-04, NFR-01 · **Priority:** S · **Points:** 1
+- **Acceptance criteria**
+  1. When I change my full name, then the new name is shown everywhere in the family, also on my past transactions.
+  2. Given I enter my current password and a new password that follows the rules of US-01.3, then the password is changed; with a wrong current password, then I see "Current password is incorrect".
+  3. The email cannot be changed in v1.
+
+### US-22 — Transfer ownership
+*As a family owner, I want to hand over ownership to another adult, so that the family can continue if I stop managing it.*
+- **Links:** FR-09, BR-18 · **Priority:** C · **Points:** 2
+- **Acceptance criteria**
+  1. When I choose an Adult Member and confirm, then that member becomes the Owner and I become an Adult Member.
+  2. A Child Member cannot be chosen as the new Owner.
+  3. The family has exactly one Owner before and after the change, and the change is written to the audit log.
+
+### US-23 — Custom categories
+*As a family owner or adult member, I want to add my own categories and subcategories, so that reports match how our family spends.*
+- **Links:** FR-15, BR-22, BR-23 · **Priority:** S · **Points:** 2
+- **Acceptance criteria**
+  1. When I create "Restaurants" under "Food", then it is an expense category and its expenses count in the Food budget (BR-15).
+  2. A subcategory always has the type of its parent, and a subcategory cannot have its own subcategories (BR-23).
+  3. Given a category used by a transaction or budget, then it can only be archived, not deleted; default categories cannot be renamed or deleted (BR-22).
 
 ## Epic E2 — Transactions
 
@@ -148,6 +172,7 @@ Story points: 1 = a few hours, 2 = about a day, 3 = 2–3 days, 5 = a week.
   1. Given Food budget 60 000 ₸ and spent 45 000 ₸, when an expense of 5 000 ₸ is added (83 %), then the Owner and Adults receive one "80 % used" notification.
   2. The same alert is not sent twice for the same budget and month.
   3. At ≥ 100 % a "Budget exceeded" notification is sent.
+  4. Given 70 % used, when one expense brings it to 105 %, then only one "Budget exceeded" notification is sent (BR-16).
 
 ### US-16 — Savings goal
 *As a family owner, I want to create a savings goal linked to a savings account, so that the family can see progress towards it.*
@@ -156,6 +181,14 @@ Story points: 1 = a few hours, 2 = about a day, 3 = 2–3 days, 5 = a week.
   1. Given a goal "Summer trip, 500 000 ₸" linked to "Savings", when Savings has 100 000 ₸, then progress shows 20 %.
   2. Money is added by a transfer into the savings account and is not counted as an expense.
   3. When the balance reaches the target, the goal is marked Achieved and the family is notified.
+
+### US-24 — Copy budgets to next month
+*As a family owner or adult member, I want to copy this month's budgets to the next month, so that I don't enter the same limits again.*
+- **Links:** FR-27, BR-14 · UC-07 · **Priority:** C · **Points:** 1
+- **Acceptance criteria**
+  1. When I click "Copy to next month", then every budget of this month is created for the next month with the same limit.
+  2. Given a category already has a budget next month, then it is not changed and I see which ones were skipped (BR-14: one budget per category per month).
+  3. Spent amounts and alert state are not copied: the new budgets start at 0 %.
 
 ## Epic E4 — Reports
 
@@ -173,7 +206,7 @@ Story points: 1 = a few hours, 2 = about a day, 3 = 2–3 days, 5 = a week.
 - **Acceptance criteria**
   1. A chart and table show expenses per category with amount and % of total.
   2. A "By member" view shows income and expenses per member.
-  3. A Child sees only their own data and never the family total (BR-13).
+  3. A Child sees only the transactions on accounts shared with them (from any member) and never the family total (BR-10, BR-13).
 
 ### US-19 — Export to CSV
 *As a family owner, I want to export transactions to CSV, so that I can analyse them in Excel.*
@@ -181,6 +214,15 @@ Story points: 1 = a few hours, 2 = about a day, 3 = 2–3 days, 5 = a week.
 - **Acceptance criteria**
   1. The export contains the currently filtered transactions with columns: date, type, amount, source account, destination account, category, member, description.
   2. The file opens correctly in Excel (UTF-8 with BOM, Cyrillic text readable).
+  3. Amounts use a dot as the decimal separator and no thousands separator (e.g. `125000.00`); dates are `YYYY-MM-DD`. The display format of NFR-20 is not used in CSV.
+
+### US-25 — Balance history
+*As a family member, I want to see how an account's balance changed over time, so that I notice trends.*
+- **Links:** FR-33, BR-07 · UC-09 · **Priority:** C · **Points:** 2
+- **Acceptance criteria**
+  1. For a chosen account and period, a chart shows the balance at the end of each day.
+  2. The last point equals the current balance; deleted transactions are not counted (BR-07).
+  3. A Child can see the history only of accounts shared with them (BR-10).
 
 ## Epic E5 — Administration
 
@@ -193,13 +235,21 @@ Story points: 1 = a few hours, 2 = about a day, 3 = 2–3 days, 5 = a week.
   3. The admin cannot see the family's transactions.
   4. Every action is recorded in the audit log.
 
+### US-26 — View the audit log
+*As a family owner, I want to see who changed what in our family, so that mistakes and misuse can be traced.*
+- **Links:** FR-38, BR-27 · **Priority:** C · **Points:** 1
+- **Acceptance criteria**
+  1. The audit log lists the family's entries with date, member, entity, action and old/new values, newest first, and can be filtered by date and entity.
+  2. Nobody can edit or delete an entry, including the Owner (BR-27).
+  3. Adult and Child Members cannot open the audit log (403).
+
 ## Backlog summary
 
 | Epic | Stories | Total points |
 |---|---|--:|
-| E1 Accounts and family | US-01 – US-07 | 14 |
+| E1 Accounts and family | US-01 – US-07, US-21 – US-23 | 19 |
 | E2 Transactions | US-08 – US-13 | 18 |
-| E3 Budgets and goals | US-14 – US-16 | 8 |
-| E4 Reports | US-17 – US-19 | 7 |
-| E5 Administration | US-20 | 2 |
-| **Total** | **20** | **49** |
+| E3 Budgets and goals | US-14 – US-16, US-24 | 9 |
+| E4 Reports | US-17 – US-19, US-25 | 9 |
+| E5 Administration | US-20, US-26 | 3 |
+| **Total** | **26** | **58** |
