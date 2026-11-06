@@ -3,21 +3,22 @@
 | | |
 |---|---|
 | **Document owner** | Nuradin Alinur — Architecture & Security |
-| **Version** | 1.1 (draft for team review) |
-| **Date** | 2026-11-05 |
+| **Version** | 1.2 (draft for team review) |
+| **Date** | 2026-11-06 |
 
-This document covers three things: the technology stack and components, how access control works (from the permission matrix in doc 02 §3), and how logins, sessions and tokens work (NFR-01 – NFR-07, FR-03, FR-06). The diagram is in [diagrams/architecture.md](diagrams/architecture.md).
+This document details the system's technology stack, core architecture components, role-based access control (RBAC), and authentication/security protocols (NFR-01 – NFR-07, FR-03, FR-06). The architecture diagram is located in [diagrams/architecture.md](diagrams/architecture.md).
 
-## 1. Technology stack (proposal)
+## 1. Technology stack
 
-PostgreSQL is already decided (D-4). The rest is **proposed** and must be confirmed with Aziza, who will write most of the code. If the team knows another stack better, the sections 2–4 still apply, only the library names change.
+PostgreSQL is decided (D-4). The code in `app/` and `requirements.txt` already uses FastAPI, SQLAlchemy, psycopg and pytest, so the stack below matches what the team is building. Items marked *not yet in the project* are still to be added.
 
-| Layer | Proposal | Why |
+| Layer | Choice | Why |
 |---|---|---|
 | Database | PostgreSQL | Decision D-4 |
 | Backend API | Python + FastAPI | Short code, automatic API docs, easy to test |
-| Database access and migrations | SQLAlchemy + Alembic | CLAUDE.md says the schema changes only through migrations |
-| Password hashing | Argon2id (`argon2-cffi`) or bcrypt | NFR-01 |
+| Database access | SQLAlchemy 2 + psycopg | Already in `requirements.txt` |
+| Migrations | Alembic (not yet in the project) | CLAUDE.md says the schema changes only through migrations; owner: Gulnaz |
+| Password hashing | Argon2id (`argon2-cffi`) or bcrypt (not yet in the project) | NFR-01 |
 | Frontend | Responsive web app (React or plain HTML + JS) | NFR-14 (from 360 px wide) |
 | Scheduler | A daily job (APScheduler or cron) that calls the service layer | FR-23, BR-26 |
 | Tests | pytest, test names by rule ID (`test_br10_...`) | NFR-18, CLAUDE.md |
@@ -44,7 +45,7 @@ From the DFD level 1 the system has five parts: the web app, the backend API, Po
 
 ### 3.2 Permission table (from doc 02 §3)
 
-One table in code, one place to change. Conditions are checked after the role.
+One table in code (`app/services/permissions.py`), one place to change. Conditions are checked after the role.
 
 | Action | Owner | Adult | Child | Sys Admin | Extra condition |
 |---|:-:|:-:|:-:|:-:|---|
@@ -109,10 +110,10 @@ The link has the form `https://<site>/invite/<token>` and `https://<site>/reset/
 
 | # | Question | Who decides |
 |---|---|---|
-| 1 | Confirm the stack in section 1 | Aziza, Nuradin |
+| 1 | ~~Confirm the stack in section 1~~ Done: the project code already uses it. Still open: frontend choice and migration tool | Aziza, Gulnaz |
 | 2 | Doc 07 says `INVITATION.token` is "random secret in the link". Section 5 stores its SHA-256 hash instead. It fits varchar(64), so no schema change, but doc 07 should say so. **Resolved in doc 07 v1.2.** | Gulnaz, Nuray |
 | 3 | NFR-07 needs proof that the user accepted the privacy notice. A column such as `privacy_accepted_at` in USER may be needed. | Gulnaz, Nuray |
-| 4 | Password minimum length (section 4) | Team |
+| 4 | ~~Password minimum length~~ **Resolved:** at least 8 characters with a letter and a digit (section 4, PR #6) | Team |
 
 ## 7. How this will be tested (for Kairat)
 

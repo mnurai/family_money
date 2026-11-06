@@ -50,23 +50,24 @@ All analysis and requirements documents are in [`docs/`](docs/README.md):
 | Layer | Technology |
 |---|---|
 | Database | PostgreSQL |
-| Backend | *TBD* |
+| Backend | Python, FastAPI |
+| Database access | SQLAlchemy 2, psycopg |
 | Frontend | *TBD* |
-| Testing | *TBD* |
+| Testing | pytest |
 
 ## Getting started
 
-> Setup instructions will be added once the stack is chosen.
+> The stack is chosen. Database setup and starting the application will be added when they exist.
 
 ```bash
 # clone the repository
 git clone <repository-url>
 cd <repository-folder>
 
-# install dependencies:  TODO
+pip install -r requirements.txt   # install dependencies
 # configure database:    TODO
 # run the application:   TODO
-# run tests:             TODO
+python -m pytest                  # run tests (from the repository root)
 ```
 
 ## Contributing
