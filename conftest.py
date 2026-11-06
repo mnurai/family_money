@@ -1,14 +1,4 @@
-"""Test fixtures for the Family Budget Tracker.
 
-The tests talk to the system only through the small `FBT` interface below
-(see tests/reference_fbt.py for its meaning).  By default they run against
-ReferenceFBT, an in-memory model of the business rules (BR-01..BR-28), which
-proves that the expected numbers in doc 06 are consistent.
-
-When the real service layer exists (Aziza), write an adapter class with the
-same methods and select it with:  FBT_ADAPTER=mypackage.adapter:RealFBT pytest
-Nothing else in the tests has to change.
-"""
 import importlib
 import os
 
