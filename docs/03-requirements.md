@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.1 |
-| **Date** | 2026-11-05 |
+| **Version** | 1.2 |
+| **Date** | 2026-11-06 |
 
 ## 1. Introduction
 
@@ -74,7 +74,7 @@ This document lists the functional and non-functional requirements of the Family
 |---|---|:-:|
 | FR-24 | The system shall allow the Owner and Adults to set a monthly spending limit for an **expense** category. | M |
 | FR-25 | The system shall show, for each budget, the limit, the amount spent (sum of EXPENSE transactions only), the remaining amount and the percentage used. | M |
-| FR-26 | The system shall notify family members when a budget reaches 80 % and when it reaches or exceeds 100 %. | S |
+| FR-26 | The system shall notify the Owner and all Adult Members (not Child Members) when a budget reaches 80 % and when it reaches or exceeds 100 %. | S |
 | FR-27 | The system shall allow a budget to be copied to the next month. | C |
 
 ### 2.7 Savings goals (GOAL)

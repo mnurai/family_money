@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.1 |
-| **Date** | 2026-11-05 |
+| **Version** | 1.2 |
+| **Date** | 2026-11-06 |
 
 Format: *As a ⟨role⟩, I want ⟨goal⟩, so that ⟨benefit⟩.* Acceptance criteria use **Given / When / Then** so that the Testing role can turn them directly into test cases. Each story is also created as a GitHub Issue (see `scripts/create_issues.sh`).
 
@@ -26,7 +26,7 @@ Story points: 1 = a few hours, 2 = about a day, 3 = 2–3 days, 5 = a week.
 - **Links:** FR-02, NFR-05, NFR-06 · UC-01 · **Priority:** M · **Points:** 2
 - **Acceptance criteria**
   1. Given correct credentials, when I log in, then I see my dashboard.
-  2. Given a wrong password, then I see "Incorrect email or password" (no hint which one is wrong).
+  2. Given a wrong password, then I see "Email or password is incorrect" (the same message for a wrong email, so no hint which one is wrong).
   3. Given 5 failed attempts, then the account is locked for 15 minutes.
   4. A "Forgot password?" link explains that the administrator can issue a reset link.
   5. Given 30 minutes of inactivity, then I am logged out.
@@ -47,7 +47,7 @@ Story points: 1 = a few hours, 2 = about a day, 3 = 2–3 days, 5 = a week.
   2. When the invited person logs in with that email, they see the pending invitation without needing the link.
   3. When the invited person accepts within 7 days, then they become a member with that role and I get a notification.
   4. Given the invitation is older than 7 days, then accepting it shows "This invitation has expired".
-  5. Given a pending invitation for this email already exists, then I see the same link again (and can renew it) but cannot create a duplicate.
+  5. Given a pending invitation for this email already exists, then I can create a new link that replaces the old one (the old link stops working, valid for 7 days from now), but I cannot create a second pending invitation.
   6. The system sends no email.
 
 ### US-05 — Manage member roles
@@ -142,7 +142,7 @@ Story points: 1 = a few hours, 2 = about a day, 3 = 2–3 days, 5 = a week.
   4. Only one budget per category per month is possible.
 
 ### US-15 — Budget alerts
-*As a family member, I want to be warned when we have used 80 % and 100 % of a budget, so that we can react before the month ends.*
+*As a family owner or adult member, I want to be warned when we have used 80 % and 100 % of a budget, so that we can react before the month ends.*
 - **Links:** FR-26, FR-35, BR-16 · UC-08 · **Priority:** S · **Points:** 2
 - **Acceptance criteria**
   1. Given Food budget 60 000 ₸ and spent 45 000 ₸, when an expense of 5 000 ₸ is added (83 %), then the Owner and Adults receive one "80 % used" notification.
