@@ -52,7 +52,7 @@ All analysis and requirements documents are in [`docs/`](docs/README.md):
 | Database | PostgreSQL |
 | Backend | Python, FastAPI |
 | Database access | SQLAlchemy 2, psycopg |
-| Frontend | *TBD* |
+| Frontend | React, TypeScript, Vite (`frontend/`) |
 | Testing | pytest |
 
 ## Getting started
@@ -68,6 +68,8 @@ pip install -r requirements.txt   # install dependencies
 # configure database:    TODO
 # run the application:   TODO
 python -m pytest                  # run tests (from the repository root)
+
+cd frontend && npm install && npm run dev   # web app on http://localhost:5173 (demo data, see frontend/README.md)
 ```
 
 ## Contributing
