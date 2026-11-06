@@ -57,12 +57,12 @@ Reference requirement and rule IDs (FR-xx, NFR-xx, BR-xx, US-xx) in code comment
 
 ## Stack and commands
 
-> Stack not chosen yet. Architecture & Security fills this in.
+> Backend: Python + FastAPI, SQLAlchemy 2, psycopg, pytest (see `requirements.txt`). Details: `docs/10-architecture-and-security.md`.
 
 ```bash
-# install dependencies:   TODO
-# run locally:            TODO
-# run tests:              TODO
+pip install -r requirements.txt   # install dependencies
+# run locally:            TODO (no API entry point yet)
+python -m pytest                  # run tests (from the repository root)
 # run linter/formatter:   TODO
 # apply DB migrations:    TODO
 ```

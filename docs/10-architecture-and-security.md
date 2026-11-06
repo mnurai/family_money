@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Document owner** | Nuradin Alinur — Architecture & Security |
-| **Version** | 1.1 (draft for team review) |
-| **Date** | 2026-11-05 |
+| **Version** | 1.2 (draft for team review) |
+| **Date** | 2026-11-06 |
 
 This document details the system's technology stack, core architecture components, role-based access control (RBAC), and authentication/security protocols (NFR-01 – NFR-07, FR-03, FR-06). The architecture diagram is located in [diagrams/architecture.md](diagrams/architecture.md).
 
@@ -12,16 +12,16 @@ This document details the system's technology stack, core architecture component
 
 PostgreSQL is decided (D-4). The code in `app/` and `requirements.txt` already uses FastAPI, SQLAlchemy, psycopg and pytest, so the stack below matches what the team is building. Items marked *not yet in the project* are still to be added.
 
-| Layer | Proposal | Why |
+| Layer | Choice | Why |
 |---|---|---|
 | Database | PostgreSQL | Decision D-4 |
 | Backend API | Python + FastAPI | Short code, automatic API docs, easy to test |
 | Database access | SQLAlchemy 2 + psycopg | Already in `requirements.txt` |
-| Migrations | Alembic (not yet in the project) | Project guidelines mandate schema modifications via migrations only; owner: Gulnaz |
+| Migrations | Alembic (not yet in the project) | CLAUDE.md says the schema changes only through migrations; owner: Gulnaz |
 | Password hashing | Argon2id (`argon2-cffi`) or bcrypt (not yet in the project) | NFR-01 |
 | Frontend | Responsive web app (React or plain HTML + JS) | NFR-14 (from 360 px wide) |
 | Scheduler | A daily job (APScheduler or cron) that calls the service layer | FR-23, BR-26 |
-| Tests | pytest, test names by rule ID (`test_br10_...`) | NFR-18, testing guidelines |
+| Tests | pytest, test names by rule ID (`test_br10_...`) | NFR-18, CLAUDE.md |
 | Source control | GitHub, pull request + one review | NFR-19 |
 
 ## 2. Components
@@ -45,7 +45,7 @@ From the DFD level 1 the system has five parts: the web app, the backend API, Po
 
 ### 3.2 Permission table (from doc 02 §3)
 
-One table in code, one place to change. Conditions are checked after the role.
+One table in code (`app/services/permissions.py`), one place to change. Conditions are checked after the role.
 
 | Action | Owner | Adult | Child | Sys Admin | Extra condition |
 |---|:-:|:-:|:-:|:-:|---|
@@ -83,7 +83,7 @@ One table in code, one place to change. Conditions are checked after the role.
 | Session | A signed token (JWT) in an `HttpOnly`, `Secure`, `SameSite=Lax` cookie, valid 30 minutes. On every request the server issues a fresh one, so it expires after 30 minutes of **inactivity**. | NFR-05 |
 | Blocked user | Login and every later request are refused with "Your account has been blocked". | FR-39 |
 | Transport | HTTPS only in deployment. | NFR-04 |
-| Secrets | Signing key and database password come from environment variables. `.env` is never committed. | Security policy |
+| Secrets | Signing key and database password come from environment variables. `.env` is never committed. | CLAUDE.md |
 | Personal data | A privacy notice must be accepted at registration. | NFR-07 |
 
 **Known limit of v1:** a signed token cannot be cancelled before it expires. After a password change (FR-04), an old token can still work for up to 30 minutes. For a student project this is acceptable. A server-side sessions table would fix it, but needs a new table.
@@ -113,7 +113,7 @@ The link has the form `https://<site>/invite/<token>` and `https://<site>/reset/
 | 1 | ~~Confirm the stack in section 1~~ Done: the project code already uses it. Still open: frontend choice and migration tool | Aziza, Gulnaz |
 | 2 | Doc 07 says `INVITATION.token` is "random secret in the link". Section 5 stores its SHA-256 hash instead. It fits varchar(64), so no schema change, but doc 07 should say so. **Resolved in doc 07 v1.2.** | Gulnaz, Nuray |
 | 3 | NFR-07 needs proof that the user accepted the privacy notice. A column such as `privacy_accepted_at` in USER may be needed. | Gulnaz, Nuray |
-| 4 | Password minimum length (section 4) | Team |
+| 4 | ~~Password minimum length~~ **Resolved:** at least 8 characters with a letter and a digit (section 4, PR #6) | Team |
 
 ## 7. How this will be tested (for Kairat)
 
