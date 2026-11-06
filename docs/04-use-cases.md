@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.1 |
-| **Date** | 2026-11-05 |
+| **Version** | 1.2 |
+| **Date** | 2026-11-06 |
 
 The use case diagram is in [diagrams/use-case-diagram.md](diagrams/use-case-diagram.md).
 
@@ -73,7 +73,7 @@ The use case diagram is in [diagrams/use-case-diagram.md](diagrams/use-case-diag
 8. System notifies the Owner that the invitation was accepted.
 
 **Alternative flows**
-- 3a. Pending invitation already exists → system shows the existing link again and offers to renew it for 7 more days.
+- 3a. Pending invitation already exists → system shows the pending invitation and offers "Create new link". A new link replaces the old one: the old link stops working and the invitation is valid for 7 days from now (BR-19). The old link cannot be shown again because only its hash is stored (doc 10 §5).
 - 6a. Invitation expired → system shows "This invitation has expired, ask the family owner for a new one".
 - 6b. Person already belongs to another family → system explains they must leave it first.
 - 7a. Person clicks "Decline" → invitation status becomes Declined; Owner is notified.
