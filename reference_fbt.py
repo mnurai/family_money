@@ -1,18 +1,4 @@
-"""In-memory reference model of the business rules (doc 06).
 
-Interface used by the tests (all amounts are strings/Decimal, month = 'YYYY-MM'):
-  create_account(name, type, opening, credit_limit=None)
-  set_budget(category, month, limit)
-  add_income(amount, to, category, date, member='Aigerim')
-  add_expense(amount, frm, category, date, member='Aigerim')
-  add_transfer(amount, frm, to, date, member='Aigerim')
-  balance(account) -> Decimal      family_total() -> Decimal
-  summary(month) -> dict(income, expenses, net)
-  budget(category, month) -> dict(limit, spent, remaining, percent)
-  expenses_by_category(month) -> {category: Decimal}
-  notifications() -> [type, ...]   transaction_count() -> int
-add_* raise ValidationError(message) when a rule is broken.
-"""
 from dataclasses import dataclass, field
 from decimal import Decimal, ROUND_HALF_UP
 from datetime import date as _date
