@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   CreditCard,
+  PartyPopper,
   PiggyBank,
   Wallet,
   X,
@@ -186,23 +187,26 @@ export function MonthSwitch({ month, onChange, max }: { month: string; onChange:
 
 // ---- toasts
 
-type Toast = { id: number; text: string; error?: boolean };
-const ToastContext = createContext<(text: string, error?: boolean) => void>(() => {});
+/** `true` or 'error' shows an error; 'celebrate' a new badge or goal milestone (FR-43, FR-44). */
+type ToastKind = boolean | 'error' | 'celebrate';
+type Toast = { id: number; text: string; kind: 'info' | 'error' | 'celebrate' };
+const ToastContext = createContext<(text: string, kind?: ToastKind) => void>(() => {});
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const push = useCallback((text: string, error?: boolean) => {
+  const push = useCallback((text: string, kind?: ToastKind) => {
     const id = Date.now() + Math.random();
-    setToasts((t) => [...t, { id, text, error }]);
-    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3200);
+    const k = kind === true || kind === 'error' ? 'error' : kind === 'celebrate' ? 'celebrate' : 'info';
+    setToasts((t) => [...t, { id, text, kind: k }]);
+    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), k === 'celebrate' ? 5000 : 3200);
   }, []);
   return (
     <ToastContext.Provider value={push}>
       {children}
       <div className="toasts" aria-live="polite">
         {toasts.map((t) => (
-          <div key={t.id} className={`toast ${t.error ? 'error' : ''}`}>
-            {t.error ? <AlertCircle size={16} /> : <CheckCircle2 size={16} />}
+          <div key={t.id} className={`toast ${t.kind === 'info' ? '' : t.kind}`}>
+            {t.kind === 'error' ? <AlertCircle size={16} /> : t.kind === 'celebrate' ? <PartyPopper size={16} /> : <CheckCircle2 size={16} />}
             {t.text}
           </div>
         ))}

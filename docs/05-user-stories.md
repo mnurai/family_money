@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.3 |
-| **Date** | 2026-11-06 |
+| **Version** | 1.4 |
+| **Date** | 2026-11-13 |
 
 Format: *As a ⟨role⟩, I want ⟨goal⟩, so that ⟨benefit⟩.* Acceptance criteria use **Given / When / Then** so that the Testing role can turn them directly into test cases. Each story is also created as a GitHub Issue (see `scripts/create_issues.sh`).
 
@@ -243,6 +243,38 @@ Story points: 1 = a few hours, 2 = about a day, 3 = 2–3 days, 5 = a week.
   2. Nobody can edit or delete an entry, including the Owner (BR-27).
   3. Adult and Child Members cannot open the audit log (403).
 
+## Epic E6 — Gamification
+
+### US-27 — Earn badges and goal milestones
+*As a family member, I want to earn badges and see milestones on our savings goals, so that keeping a budget feels rewarding and I keep the habit.*
+- **Links:** FR-43, FR-44, BR-29, BR-30 · **Priority:** S · **Points:** 3
+- **Acceptance criteria**
+  1. **Given** I have recorded no transactions, **when** I open Achievements, **then** no personal badge is earned and each shows what to do to earn it.
+  2. **Given** I record my first transaction, **when** the save succeeds, **then** I get the message "New badge: First step" and the badge shows the date it was earned.
+  3. A badge with a count (e.g. 25 transactions, 7 days in a row) shows progress such as "10 of 25".
+  4. Month badges (In the green, Budget keeper, Positive month) are earned only for a month that has ended, and transfers never count as income or spending (BR-12).
+  5. **Given** a goal of 600 000 ₸ with 200 000 ₸ saved, **then** the 25 % milestone is marked as reached and the goal says "Next milestone: 50 %, 100 000 ₸ to go". After a transfer of 100 000 ₸ I get the message that the goal reached 50 %.
+  6. A Child Member sees only personal badges, never family badges or goal milestones (BR-30, BR-13).
+
+### US-28 — Points and levels
+*As a family member, I want my badges to give points and a level, so that I can see my progress grow over time.*
+- **Links:** FR-45, BR-31 · **Priority:** S · **Points:** 2
+- **Acceptance criteria**
+  1. Every badge shows its points (e.g. "+25 pts"); only earned badges count towards my total.
+  2. My level and its name are shown next to my name on every screen, e.g. "Lv 3 · Saver".
+  3. Levels start at 0, 20, 50, 100 and 160 points; the Achievements page shows how many points are left to the next level.
+  4. **Given** I have 45 points, **when** I earn a 10-point badge, **then** I see "Level up! You are now level 3, Saver".
+
+### US-29 — Kids' savings challenge
+*As a parent, I want to set a savings challenge for my child, so that they learn to save towards something they want.*
+- **Links:** FR-46, BR-32, BR-10 · **Priority:** S · **Points:** 3
+- **Acceptance criteria**
+  1. **Given** the account "Aidar — pocket money" is shared with Aidar, **when** I create the challenge "Headphones" with a target of 25 000 ₸, **then** Aidar sees it on his overview with 4 stars for 25 / 50 / 75 / 100 %.
+  2. I can only choose a Child Member and an account shared with that child; otherwise I see "Choose an account shared with this child".
+  3. A child can have one active challenge; a second one is refused with "This child already has an active challenge".
+  4. When the account balance reaches the target, the challenge is complete; Aidar and the Owner and Adults get a notification, and Aidar earns the "Challenge champion" badge.
+  5. A Child Member cannot create or cancel challenges (403). If the account stops being shared with the child, the challenge is cancelled.
+
 ## Backlog summary
 
 | Epic | Stories | Total points |
@@ -252,4 +284,5 @@ Story points: 1 = a few hours, 2 = about a day, 3 = 2–3 days, 5 = a week.
 | E3 Budgets and goals | US-14 – US-16, US-24 | 9 |
 | E4 Reports | US-17 – US-19, US-25 | 9 |
 | E5 Administration | US-20, US-26 | 3 |
-| **Total** | **26** | **58** |
+| E6 Gamification | US-27 – US-29 | 8 |
+| **Total** | **29** | **66** |

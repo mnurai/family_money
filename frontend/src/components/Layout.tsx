@@ -11,6 +11,7 @@ import {
   Plus,
   RotateCcw,
   Target,
+  Trophy,
   Users,
   Wallet,
   Gauge,
@@ -18,6 +19,7 @@ import {
 import { api } from '../api';
 import { formatDate } from '../lib/dates';
 import { useLoad, useMember, useSession } from '../state/session';
+import { Celebrations, LevelChip, useLevel } from './Achievements';
 import { TransactionForm, type TxDraft } from './TransactionForm';
 import { Avatar, ROLE_LABEL } from './ui';
 
@@ -37,6 +39,7 @@ export function Layout() {
     { to: '/budgets', label: 'Budgets', icon: Gauge, show: isGrownUp },
     { to: '/goals', label: 'Goals', icon: Target, show: isGrownUp },
     { to: '/reports', label: 'Reports', icon: ChartPie, show: true },
+    { to: '/achievements', label: 'Achievements', icon: Trophy, show: true },
     { to: '/members', label: 'Family', icon: Users, show: true },
     { to: '/audit', label: 'Audit log', icon: History, show: isOwner },
   ].filter((n) => n.show);
@@ -78,6 +81,7 @@ export function Layout() {
             <span className="muted small hide-mobile">
               {member.fullName} · {ROLE_LABEL[member.role]}
             </span>
+            <TopbarLevel />
             <Notifications />
             <MobileUser />
           </header>
@@ -100,7 +104,18 @@ export function Layout() {
       </button>
 
       {draft && <TransactionForm draft={draft} onClose={() => setDraft(null)} />}
+      <Celebrations />
     </TxDialog.Provider>
+  );
+}
+
+/** FR-45: the member's level next to their name. */
+function TopbarLevel() {
+  const level = useLevel();
+  return (
+    <NavLink to="/achievements" style={{ textDecoration: 'none' }} aria-label={level ? `Level ${level.level}, ${level.name}` : 'Achievements'}>
+      <LevelChip level={level} />
+    </NavLink>
   );
 }
 
