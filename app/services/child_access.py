@@ -13,12 +13,12 @@ from app.models import Account, AccountAccess, AuditLog, FamilyMember
 from app.services.permissions import can
 
 
-def _check_permission(actor_role: str) -> None:
+def _check_permission(actor_role: str) -> None:  # это делает владелец?
     if not can(actor_role, "share_account"):
         raise HTTPException(status.HTTP_403_FORBIDDEN, "You do not have permission to do this")
 
 
-def _get_child(db: Session, family_id: int, member_id: int) -> FamilyMember:
+def _get_child(db: Session, family_id: int, member_id: int) -> FamilyMember: # это ребёнок из моей семьи?
     member = db.get(FamilyMember, member_id)
     # Another family's member looks the same as a missing one (NFR-03).
     if member is None or member.family_id != family_id or member.removed_at is not None:
@@ -40,7 +40,7 @@ def grant_access(db: Session, *, family_id: int, actor_user_id: int, actor_role:
     """Share an account with a child. Doing it twice changes nothing."""
     _check_permission(actor_role)
     _get_child(db, family_id, child_member_id)
-    account = _get_account(db, family_id, account_id)
+    account = _get_account(db, family_id, account_id)  #счёт из моей семьи?
     if account.is_archived:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "An archived account cannot be shared")
 
@@ -48,7 +48,7 @@ def grant_access(db: Session, *, family_id: int, actor_user_id: int, actor_role:
     if existing is not None:
         return existing
 
-    row = AccountAccess(account_id=account_id, member_id=child_member_id)
+    row = AccountAccess(account_id=account_id, member_id=child_member_id) # доступ выдан
     db.add(row)
     db.add(AuditLog(
         family_id=family_id, actor_user_id=actor_user_id, entity_type="ACCOUNT_ACCESS",
