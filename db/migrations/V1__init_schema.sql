@@ -1,17 +1,26 @@
--- Полный скрипт базы данных family_db для PostgreSQL
+-- Полный скрипт базы данных family_db для PostgreSQL (с учетом data dictionary)
 
--- Создание пользовательских ENUM-типов
-CREATE TYPE user_role AS ENUM ('OWNER', 'ADULT', 'CHILD');
+-- Создание пользовательских ENUM-типов строго по docs/07-data-dictionary.md
+CREATE TYPE member_role AS ENUM ('OWNER', 'ADULT', 'CHILD');
+CREATE TYPE invitation_status AS ENUM ('PENDING', 'ACCEPTED', 'DECLINED', 'EXPIRED');
 CREATE TYPE account_type AS ENUM ('CASH', 'BANK_CARD', 'SAVINGS', 'CREDIT_CARD');
 CREATE TYPE category_type AS ENUM ('INCOME', 'EXPENSE');
-CREATE TYPE rule_frequency AS ENUM ('WEEKLY', 'MONTHLY', 'YEARLY');
-CREATE TYPE trans_type AS ENUM ('INCOME', 'EXPENSE', 'TRANSFER');
+CREATE TYPE transaction_type AS ENUM ('INCOME', 'EXPENSE', 'TRANSFER');
+CREATE TYPE frequency AS ENUM ('WEEKLY', 'MONTHLY', 'YEARLY');
 CREATE TYPE goal_status AS ENUM ('ACTIVE', 'ACHIEVED', 'CANCELLED');
-CREATE TYPE invite_status AS ENUM ('PENDING', 'ACCEPTED', 'DECLINED', 'EXPIRED');
-CREATE TYPE notif_type AS ENUM ('BUDGET_80', 'BUDGET_100', 'INVITE_ACCEPTED', 'INVITE_DECLINED', 'RECURRING_CREATED', 'RECURRING_SKIPPED', 'GOAL_ACHIEVED');
+CREATE TYPE notification_type AS ENUM ('BUDGET_80', 'BUDGET_100', 'INVITE_ACCEPTED', 'INVITE_DECLINED', 'RECURRING_CREATED', 'RECURRING_SKIPPED', 'GOAL_ACHIEVED');
 CREATE TYPE audit_action AS ENUM ('CREATE', 'UPDATE', 'DELETE', 'BLOCK', 'UNBLOCK');
 
--- 1. Таблица пользователей (USERS)
+-- Функция для автоматического обновления updated_at
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 1. Таблица пользователей (users)
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -20,62 +29,62 @@ CREATE TABLE users (
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     is_system_admin BOOLEAN NOT NULL DEFAULT FALSE,
     failed_login_count SMALLINT NOT NULL DEFAULT 0,
-    locked_until TIMESTAMP NULL,
+    locked_until TIMESTAMPTZ NULL,
     reset_token_hash VARCHAR(255) NULL,
-    reset_token_expires_at TIMESTAMP NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    last_login_at TIMESTAMP NULL
+    reset_token_expires_at TIMESTAMPTZ NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_login_at TIMESTAMPTZ NULL
 );
 
--- 2. Таблица семей (FAMILIES)
+-- 2. Таблица семей (families)
 CREATE TABLE families (
     family_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     base_currency CHAR(3) NOT NULL DEFAULT 'KZT',
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- 3. Связь пользователя с семьей (FAMILY_MEMBERS)
+-- 3. Связь пользователя с семьей (family_members)
 CREATE TABLE family_members (
     member_id SERIAL PRIMARY KEY,
     family_id INT NOT NULL,
     user_id INT NOT NULL UNIQUE,
-    role user_role NOT NULL,
-    joined_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    removed_at TIMESTAMP NULL,
+    role member_role NOT NULL,
+    joined_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    removed_at TIMESTAMPTZ NULL,
     FOREIGN KEY (family_id) REFERENCES families(family_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
--- 4. Счета (ACCOUNTS)
+-- 4. Счета (accounts)
 CREATE TABLE accounts (
     account_id SERIAL PRIMARY KEY,
     family_id INT NOT NULL,
     name VARCHAR(60) NOT NULL,
     type account_type NOT NULL,
-    opening_balance DECIMAL(14,2) NOT NULL DEFAULT 0.00,
-    current_balance DECIMAL(14,2) NOT NULL DEFAULT 0.00,
-    credit_limit DECIMAL(14,2) NULL,
+    opening_balance NUMERIC(14,2) NOT NULL DEFAULT 0.00,
+    current_balance NUMERIC(14,2) NOT NULL DEFAULT 0.00,
+    credit_limit NUMERIC(14,2) NULL,
     is_archived BOOLEAN NOT NULL DEFAULT FALSE,
     created_by INT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uq_family_account_name UNIQUE (family_id, name),
     CONSTRAINT chk_credit_limit CHECK (credit_limit IS NULL OR credit_limit >= 0),
     FOREIGN KEY (family_id) REFERENCES families(family_id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES family_members(member_id)
 );
 
--- 5. Доступ детей к счетам (ACCOUNT_ACCESS)
+-- 5. Доступ детей к счетам (account_access)
 CREATE TABLE account_access (
     account_id INT NOT NULL,
     member_id INT NOT NULL,
-    granted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    granted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (account_id, member_id),
     FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE,
     FOREIGN KEY (member_id) REFERENCES family_members(member_id) ON DELETE CASCADE
 );
 
--- 6. Категории (CATEGORIES)
+-- 6. Категории (categories)
 CREATE TABLE categories (
     category_id SERIAL PRIMARY KEY,
     family_id INT NULL,
@@ -87,17 +96,17 @@ CREATE TABLE categories (
     FOREIGN KEY (parent_id) REFERENCES categories(category_id) ON DELETE SET NULL
 );
 
--- 7. Регулярные правила (RECURRING_RULES)
+-- 7. Регулярные правила (recurring_rules)
 CREATE TABLE recurring_rules (
     rule_id SERIAL PRIMARY KEY,
     family_id INT NOT NULL,
-    type trans_type NOT NULL,
-    amount DECIMAL(14,2) NOT NULL,
+    type transaction_type NOT NULL,
+    amount NUMERIC(14,2) NOT NULL,
     source_account_id INT NULL,
     destination_account_id INT NULL,
     category_id INT NULL,
     description VARCHAR(255) NULL,
-    frequency rule_frequency NOT NULL,
+    frequency frequency NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NULL,
     next_run_date DATE NOT NULL,
@@ -112,12 +121,12 @@ CREATE TABLE recurring_rules (
     FOREIGN KEY (created_by) REFERENCES family_members(member_id)
 );
 
--- 8. Транзакции (TRANSACTIONS)
+-- 8. Транзакции (transactions)
 CREATE TABLE transactions (
     transaction_id SERIAL PRIMARY KEY,
     family_id INT NOT NULL,
-    type trans_type NOT NULL,
-    amount DECIMAL(14,2) NOT NULL,
+    type transaction_type NOT NULL,
+    amount NUMERIC(14,2) NOT NULL,
     source_account_id INT NULL,
     destination_account_id INT NULL,
     category_id INT NULL,
@@ -126,8 +135,8 @@ CREATE TABLE transactions (
     created_by INT NOT NULL,
     recurring_rule_id INT NULL,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT chk_amount_positive CHECK (amount > 0),
     CONSTRAINT chk_transaction_logic CHECK (
       (type = 'INCOME'   AND source_account_id IS NULL     AND destination_account_id IS NOT NULL AND category_id IS NOT NULL) OR
@@ -143,19 +152,25 @@ CREATE TABLE transactions (
     FOREIGN KEY (recurring_rule_id) REFERENCES recurring_rules(rule_id)
 );
 
--- Индексы для транзакций
+-- Триггер для автообновления updated_at
+CREATE TRIGGER trg_transactions_updated_at
+BEFORE UPDATE ON transactions
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+-- Индексы
 CREATE INDEX idx_trans_family_date ON transactions(family_id, transaction_date);
 CREATE INDEX idx_trans_source ON transactions(source_account_id);
 CREATE INDEX idx_trans_dest ON transactions(destination_account_id);
 CREATE INDEX idx_trans_category ON transactions(category_id, transaction_date);
 
--- 9. Бюджеты (BUDGETS)
+-- 9. Бюджеты (budgets)
 CREATE TABLE budgets (
     budget_id SERIAL PRIMARY KEY,
     family_id INT NOT NULL,
     category_id INT NOT NULL,
     period_month DATE NOT NULL,
-    limit_amount DECIMAL(14,2) NOT NULL,
+    limit_amount NUMERIC(14,2) NOT NULL,
     alert_80_sent BOOLEAN NOT NULL DEFAULT FALSE,
     alert_100_sent BOOLEAN NOT NULL DEFAULT FALSE,
     created_by INT NOT NULL,
@@ -166,13 +181,13 @@ CREATE TABLE budgets (
     FOREIGN KEY (created_by) REFERENCES family_members(member_id)
 );
 
--- 10. Цели накопления (SAVINGS_GOALS)
+-- 10. Цели накопления (savings_goals)
 CREATE TABLE savings_goals (
     goal_id SERIAL PRIMARY KEY,
     family_id INT NOT NULL,
     account_id INT NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
-    target_amount DECIMAL(14,2) NOT NULL,
+    target_amount NUMERIC(14,2) NOT NULL,
     target_date DATE NULL,
     status goal_status NOT NULL DEFAULT 'ACTIVE',
     created_by INT NOT NULL,
@@ -182,35 +197,36 @@ CREATE TABLE savings_goals (
     FOREIGN KEY (created_by) REFERENCES family_members(member_id)
 );
 
--- 11. Приглашения (INVITATIONS)
+-- 11. Приглашения (invitations)
 CREATE TABLE invitations (
     invitation_id SERIAL PRIMARY KEY,
     family_id INT NOT NULL,
     email VARCHAR(255) NOT NULL,
-    role user_role NOT NULL,
+    role member_role NOT NULL,
     token VARCHAR(64) NOT NULL UNIQUE,
     invited_by INT NOT NULL,
-    status invite_status NOT NULL DEFAULT 'PENDING',
-    expires_at TIMESTAMP NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status invitation_status NOT NULL DEFAULT 'PENDING',
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_invitation_role CHECK (role IN ('ADULT', 'CHILD')),
     FOREIGN KEY (family_id) REFERENCES families(family_id) ON DELETE CASCADE,
     FOREIGN KEY (invited_by) REFERENCES family_members(member_id)
 );
 
--- 12. Уведомления (NOTIFICATIONS)
+-- 12. Уведомления (notifications)
 CREATE TABLE notifications (
     notification_id SERIAL PRIMARY KEY,
     member_id INT NOT NULL,
-    type notif_type NOT NULL,
+    type notification_type NOT NULL,
     message VARCHAR(255) NOT NULL,
     related_entity VARCHAR(30) NULL,
     related_id INT NULL,
     is_read BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (member_id) REFERENCES family_members(member_id) ON DELETE CASCADE
 );
 
--- 13. Аудит-лог (AUDIT_LOGS)
+-- 13. Аудит-лог (audit_logs)
 CREATE TABLE audit_logs (
     log_id BIGSERIAL PRIMARY KEY,
     family_id INT NULL,
@@ -220,12 +236,12 @@ CREATE TABLE audit_logs (
     action audit_action NOT NULL,
     old_value JSONB NULL,
     new_value JSONB NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (family_id) REFERENCES families(family_id) ON DELETE CASCADE,
     FOREIGN KEY (actor_user_id) REFERENCES users(user_id)
 );
 
--- НАЧАЛЬНЫЕ (SEED) ДАННЫЕ
+-- SEED ДАННЫЕ
 INSERT INTO users (user_id, email, password_hash, full_name, is_active) 
 VALUES (1, 'john.smith@family.com', '$2y$10$abcdefghijklmnopqrstuv', 'John Smith', TRUE);
 
