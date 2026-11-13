@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.2 |
-| **Date** | 2026-11-06 |
+| **Version** | 1.3 |
+| **Date** | 2026-11-13 |
 
 The matrix links every requirement to the use case and user story it comes from, the business rules and data it depends on, the team member who implements it and the test that verifies it. **Test case IDs are reserved here; the Testing role fills in the test details and the Status column.**
 
@@ -60,6 +60,10 @@ The matrix links every requirement to the use case and user story it comes from,
 | FR-37 | Audit log | S | UC-06 | US-11 | BR-27 | AUDIT_LOG | AS, DB | TC-37 | ⬜ |
 | FR-38 | View audit log | C | — | US-26 | BR-27 | AUDIT_LOG | AD | TC-38 | ⬜ |
 | FR-39 | Block / unblock user | S | UC-12 | US-20 | — | USER, AUDIT_LOG | AD, AS | TC-39 | ⬜ |
+| FR-43 | Achievement badges | S | — | US-27 | BR-12, BR-13, BR-29, BR-30 | TRANSACTION, BUDGET, SAVINGS_GOAL | SA (web app), AD | TC-43 | 🟨 |
+| FR-44 | Savings-goal milestones | S | UC-10 | US-27 | BR-25, BR-29, BR-30 | SAVINGS_GOAL, ACCOUNT | SA (web app), AD | TC-44 | 🟨 |
+| FR-45 | Points and levels | S | — | US-28 | BR-29, BR-31 | TRANSACTION, BUDGET, SAVINGS_GOAL | SA (web app), AD | TC-45 | 🟨 |
+| FR-46 | Kids' savings challenge | S | — | US-29 | BR-10, BR-25, BR-32 | SAVINGS_CHALLENGE, ACCOUNT, ACCOUNT_ACCESS, NOTIFICATION | SA (web app), AD, DB | TC-46 | 🟨 |
 
 ## Non-functional requirements
 
@@ -93,5 +97,5 @@ The matrix links every requirement to the use case and user story it comes from,
 - Every Must requirement has at least one use case or user story ✅
 - Every use case is linked to at least one requirement ✅
 - FR-36 (email) is Won't in v1 (D-3) and is not traced
-- Every business rule BR-01 – BR-28 is referenced by at least one requirement ✅
+- Every business rule BR-01 – BR-32 is referenced by at least one requirement ✅
 - Every entity in the data dictionary is used by at least one requirement ✅

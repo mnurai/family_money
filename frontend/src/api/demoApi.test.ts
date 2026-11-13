@@ -102,6 +102,51 @@ describe('rules', () => {
     ).rejects.toThrow('Children can record only income and expenses');
   });
 
+  it('br30 a child gets only personal badges; the owner also gets family badges', async () => {
+    await api.login('aidar@mail.kz', DEMO_PASSWORD);
+    const child = await api.achievements();
+    expect(child.every((b) => b.scope === 'PERSONAL')).toBe(true);
+    expect(child.find((b) => b.id === 'FIRST_STEP')!.earned).toBe(true); // Aidar recorded pocket-money income
+    await api.logout();
+    await api.login('aigerim@mail.kz', DEMO_PASSWORD);
+    const owner = await api.achievements();
+    expect(owner.some((b) => b.scope === 'FAMILY')).toBe(true);
+    expect(owner.find((b) => b.id === 'PLANNER')!.earned).toBe(true);
+  });
+
+  it('br32 only grown-ups set challenges, only for a child, on an account shared with that child', async () => {
+    await api.login('aidar@mail.kz', DEMO_PASSWORD);
+    const [mine] = await api.challenges();
+    expect(mine).toMatchObject({ name: 'Headphones', status: 'ACTIVE' });
+    await expect(api.createChallenge({ childMemberId: mine.childMemberId, accountId: mine.accountId, name: 'Ball', targetAmount: kzt(50_000), targetDate: null })).rejects.toThrow('Only the owner and adults can set challenges');
+    await api.logout();
+    await api.login('aigerim@mail.kz', DEMO_PASSWORD);
+    const adult = (await api.members()).find((m) => m.role === 'ADULT')!;
+    const kaspi = (await api.accounts()).find((a) => a.name === 'Kaspi card')!;
+    await expect(api.createChallenge({ childMemberId: adult.memberId, accountId: mine.accountId, name: 'X', targetAmount: kzt(1_000), targetDate: null })).rejects.toThrow('Challenges can be set only for child members');
+    await expect(api.createChallenge({ childMemberId: mine.childMemberId, accountId: kaspi.accountId, name: 'X', targetAmount: kzt(900_000), targetDate: null })).rejects.toThrow('Choose an account shared with this child');
+    await expect(api.createChallenge({ childMemberId: mine.childMemberId, accountId: mine.accountId, name: 'X', targetAmount: kzt(90_000), targetDate: null })).rejects.toThrow('This child already has an active challenge');
+  });
+
+  it('fr46 reaching the target completes the challenge, tells the child and earns the badge', async () => {
+    await api.login('aigerim@mail.kz', DEMO_PASSWORD);
+    const [ch] = await api.challenges();
+    const kaspi = (await api.accounts()).find((a) => a.name === 'Kaspi card')!;
+    await api.createTransaction({ type: 'TRANSFER', amount: ch.targetAmount - ch.saved, sourceAccountId: kaspi.accountId, destinationAccountId: ch.accountId, categoryId: null, transactionDate: d, description: null });
+    expect((await api.challenges())[0].status).toBe('ACHIEVED');
+    await api.logout();
+    await api.login('aidar@mail.kz', DEMO_PASSWORD);
+    expect((await api.notifications())[0].message).toContain('Challenge “Headphones” complete');
+    expect((await api.achievements()).find((b) => b.id === 'CHALLENGE_CHAMPION')!.earned).toBe(true);
+  });
+
+  it('br32 taking back the shared account cancels the child’s challenge', async () => {
+    await api.login('aigerim@mail.kz', DEMO_PASSWORD);
+    const [ch] = await api.challenges();
+    await api.setSharing(ch.accountId, []);
+    expect(await api.challenges()).toEqual([]);
+  });
+
   it('br11 an adult cannot edit a transaction recorded by someone else', async () => {
     await api.login('daulet@mail.kz', DEMO_PASSWORD);
     const me = (await api.me())!.member!;

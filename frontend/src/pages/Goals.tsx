@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { ArrowLeftRight, CheckCircle2, Plus, Target } from 'lucide-react';
+import { MilestoneBar, NextMilestone } from '../components/Achievements';
+import { KidsChallenges } from '../components/Challenges';
 import { api } from '../api';
 import { useAddTransaction } from '../components/Layout';
-import { Confirm, Empty, ErrorAlert, Field, Modal, Money, Progress, Skeleton, useToast } from '../components/ui';
+import { Confirm, Empty, ErrorAlert, Field, Modal, Money, Skeleton, useToast } from '../components/ui';
 import { today } from '../lib/dates';
 import { formatMoney, parseAmount } from '../lib/money';
 import { useLoad, useMember } from '../state/session';
@@ -55,7 +57,7 @@ export function GoalsPage() {
                   <span className="stat-value num"><Money value={g.saved} /></span>
                   <span className="muted"> of <Money value={g.targetAmount} /></span>
                 </div>
-                <Progress percent={pct} tone="goal" large />
+                <MilestoneBar saved={g.saved} target={g.targetAmount} />
                 <div className="row-between small muted">
                   <span className="num">{Math.min(pct, 100)} %</span>
                   {!achieved && left > 0 && (
@@ -64,6 +66,7 @@ export function GoalsPage() {
                     </span>
                   )}
                 </div>
+                {!achieved && <NextMilestone saved={g.saved} target={g.targetAmount} />}
                 <div className="row">
                   {!achieved && (
                     <button className="btn" onClick={() => addTx({ type: 'TRANSFER', toAccountId: g.accountId })}>
@@ -77,6 +80,8 @@ export function GoalsPage() {
           })}
         </div>
       )}
+
+      <KidsChallenges />
 
       {adding && <GoalForm onClose={() => setAdding(false)} />}
       {cancelling !== null && (

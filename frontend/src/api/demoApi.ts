@@ -1,6 +1,7 @@
 // Demo implementation of the API used by the screens. See demoStore.ts for why it exists.
 // Each method names the requirement or rule it follows; messages match the use cases (NFR-15).
 
+import { computeAchievements, type Achievement } from '../lib/achievements';
 import { monthKey, monthRange, shiftMonth, today } from '../lib/dates';
 import { formatMoney, type Tiyn } from '../lib/money';
 import {
@@ -15,6 +16,7 @@ import {
   type DbAccount,
   type DbAudit,
   type DbBudget,
+  type DbChallenge,
   type DbMember,
   type DbTransaction,
   type DbUser,
@@ -26,6 +28,7 @@ import {
   type AuditEntry,
   type Budget,
   type Category,
+  type Challenge,
   type Goal,
   type Invitation,
   type Me,
@@ -266,6 +269,42 @@ function checkGoals(d: Db, familyId: number) {
       notify(d, grownUps(d, familyId), 'GOAL_ACHIEVED', `Goal “${g.name}” achieved: ${formatMoney(g.targetAmount)} saved`);
     }
   }
+}
+
+/** FR-46, BR-32: a challenge is achieved once its account balance reaches the target; it stays achieved. */
+function checkChallenges(d: Db, familyId: number) {
+  const txs = liveTx(d, familyId);
+  for (const ch of d.challenges.filter((x) => x.familyId === familyId && x.status === 'ACTIVE')) {
+    const account = d.accounts.find((a) => a.accountId === ch.accountId)!;
+    if (balanceOf(account, txs) >= ch.targetAmount) {
+      ch.status = 'ACHIEVED';
+      ch.achievedAt = nowIso();
+      const child = toMember(d, d.members.find((m) => m.memberId === ch.childMemberId)!);
+      notify(d, [ch.childMemberId], 'GOAL_ACHIEVED', `Challenge “${ch.name}” complete: you saved ${formatMoney(ch.targetAmount)}!`);
+      notify(d, grownUps(d, familyId), 'GOAL_ACHIEVED', `${child.fullName} completed the challenge “${ch.name}” (${formatMoney(ch.targetAmount)})`);
+    }
+  }
+}
+
+/** BR-32: a challenge ends when the child can no longer see its account. */
+function cancelChallengesWhere(d: Db, pred: (ch: DbChallenge) => boolean) {
+  for (const ch of d.challenges) if (ch.status === 'ACTIVE' && pred(ch)) ch.status = 'CANCELLED';
+}
+
+function toChallenge(d: Db, ch: DbChallenge): Challenge {
+  const account = d.accounts.find((a) => a.accountId === ch.accountId)!;
+  return {
+    challengeId: ch.challengeId,
+    childMemberId: ch.childMemberId,
+    childName: toMember(d, d.members.find((m) => m.memberId === ch.childMemberId)!).fullName,
+    accountId: ch.accountId,
+    accountName: account.name,
+    name: ch.name,
+    targetAmount: ch.targetAmount,
+    targetDate: ch.targetDate,
+    status: ch.status,
+    saved: balanceOf(account, liveTx(d, ch.familyId)),
+  };
 }
 
 // ---------------------------------------------------------------- transaction validation (BR-01 – BR-10)
@@ -555,7 +594,10 @@ export const demoApi = {
       if (m.role === 'OWNER') throw bad('The family always has one owner. Transfer ownership first.'); // BR-18
       const old = m.role;
       m.role = role;
-      if (role !== 'CHILD') d.accountAccess = d.accountAccess.filter((a) => a.memberId !== memberId);
+      if (role !== 'CHILD') {
+        d.accountAccess = d.accountAccess.filter((a) => a.memberId !== memberId);
+        cancelChallengesWhere(d, (ch) => ch.childMemberId === memberId);
+      }
       audit(d, c, { entityType: 'FAMILY_MEMBER', entityId: memberId, action: 'UPDATE', summary: `${toMember(d, m).fullName}: role ${old.toLowerCase()} → ${role.toLowerCase()}`, oldValue: { role: old }, newValue: { role } });
     }),
 
@@ -568,6 +610,7 @@ export const demoApi = {
       if (m.role === 'OWNER') throw bad('The owner cannot be removed. Transfer ownership first.'); // BR-18
       m.removedAt = nowIso(); // history stays (BR-20)
       d.accountAccess = d.accountAccess.filter((a) => a.memberId !== memberId);
+      cancelChallengesWhere(d, (ch) => ch.childMemberId === memberId);
       audit(d, c, { entityType: 'FAMILY_MEMBER', entityId: memberId, action: 'DELETE', summary: `${toMember(d, m).fullName} removed from the family`, oldValue: { ...m, removedAt: null }, newValue: m });
     }),
 
@@ -634,6 +677,7 @@ export const demoApi = {
       if (!a) throw notFound('Account');
       if (balanceOf(a, liveTx(d, c.familyId)) !== 0) throw bad('Move the remaining money to another account first');
       a.isArchived = true;
+      cancelChallengesWhere(d, (ch) => ch.accountId === accountId);
       audit(d, c, { entityType: 'ACCOUNT', entityId: accountId, action: 'UPDATE', summary: `Account “${a.name}” archived`, oldValue: { isArchived: false }, newValue: { isArchived: true } });
     }),
 
@@ -649,6 +693,7 @@ export const demoApi = {
         if (!m || m.role !== 'CHILD') throw bad('Accounts can be shared only with child members');
       }
       d.accountAccess = d.accountAccess.filter((x) => x.accountId !== accountId).concat(childMemberIds.map((memberId) => ({ accountId, memberId })));
+      cancelChallengesWhere(d, (ch) => ch.accountId === accountId && !childMemberIds.includes(ch.childMemberId));
     }),
 
   // ---- categories (FR-14)
@@ -690,6 +735,7 @@ export const demoApi = {
       audit(d, c, { entityType: 'TRANSACTION', entityId: t.transactionId, action: 'CREATE', summary: describeTx(t), oldValue: null, newValue: { ...t } });
       if (t.type === 'EXPENSE') checkBudget(d, c.familyId, t.categoryId, t.transactionDate);
       checkGoals(d, c.familyId);
+      checkChallenges(d, c.familyId);
       return toTx(t);
     }),
 
@@ -708,6 +754,7 @@ export const demoApi = {
       if (old.type === 'EXPENSE') checkBudget(d, c.familyId, old.categoryId, old.transactionDate);
       if (t.type === 'EXPENSE') checkBudget(d, c.familyId, t.categoryId, t.transactionDate);
       checkGoals(d, c.familyId);
+      checkChallenges(d, c.familyId);
     }),
 
   /** Soft delete (BR-11), with an audit entry. */
@@ -823,6 +870,47 @@ export const demoApi = {
       g.status = 'CANCELLED';
     }),
 
+  // ---- kids' savings challenges (FR-46, BR-32)
+
+  /** Owner and Adults see every child's challenges; a Child sees only their own. */
+  challenges: () =>
+    read((d): Challenge[] => {
+      const c = ctx(d);
+      return d.challenges
+        .filter((ch) => ch.familyId === c.familyId && ch.status !== 'CANCELLED')
+        .filter((ch) => c.role !== 'CHILD' || ch.childMemberId === c.member.memberId)
+        .sort((a, b) => (a.status === b.status ? b.challengeId - a.challengeId : a.status === 'ACTIVE' ? -1 : 1))
+        .map((ch) => toChallenge(d, ch));
+    }),
+
+  createChallenge: (p: { childMemberId: number; accountId: number; name: string; targetAmount: Tiyn; targetDate: string | null }) =>
+    write((d) => {
+      const c = ctx(d);
+      requireRole(c, ['OWNER', 'ADULT'], 'Only the owner and adults can set challenges');
+      const name = p.name.trim();
+      if (!name) throw bad('Enter a challenge name');
+      if (name.length > 100) throw bad('Challenge name can be at most 100 characters');
+      if (!Number.isInteger(p.targetAmount) || p.targetAmount <= 0) throw bad('Target amount must be greater than 0');
+      if (p.targetDate && p.targetDate < today()) throw bad('Target date cannot be in the past');
+      const child = d.members.find((m) => m.memberId === p.childMemberId && m.familyId === c.familyId && m.removedAt === null);
+      if (!child || child.role !== 'CHILD') throw bad('Challenges can be set only for child members');
+      const account = d.accounts.find((a) => a.accountId === p.accountId && a.familyId === c.familyId && !a.isArchived);
+      if (!account || !sharedAccountIds(d, child.memberId).has(account.accountId)) throw bad('Choose an account shared with this child');
+      if (d.challenges.some((ch) => ch.childMemberId === child.memberId && ch.status === 'ACTIVE')) throw bad('This child already has an active challenge');
+      const balance = balanceOf(account, liveTx(d, c.familyId));
+      if (balance >= p.targetAmount) throw bad(`The account already has ${formatMoney(balance)}. Choose a bigger target.`);
+      d.challenges.push({ challengeId: nextId(d), familyId: c.familyId, childMemberId: child.memberId, accountId: account.accountId, name, targetAmount: p.targetAmount, targetDate: p.targetDate, status: 'ACTIVE', createdBy: c.member.memberId, createdAt: nowIso(), achievedAt: null });
+    }),
+
+  cancelChallenge: (challengeId: number) =>
+    write((d) => {
+      const c = ctx(d);
+      requireRole(c, ['OWNER', 'ADULT']);
+      const ch = d.challenges.find((x) => x.challengeId === challengeId && x.familyId === c.familyId);
+      if (!ch) throw notFound('Challenge');
+      ch.status = 'CANCELLED';
+    }),
+
   // ---- reports (FR-30 – FR-32, BR-12)
 
   summary: (from: string, to: string) =>
@@ -880,6 +968,31 @@ export const demoApi = {
     write((d) => {
       const c = ctx(d);
       for (const n of d.notifications) if (n.memberId === c.member.memberId) n.isRead = true;
+    }),
+
+  // ---- achievements (FR-43, BR-29, BR-30)
+
+  /** Derived from stored data on every call; family badges only for the Owner and Adults. */
+  achievements: () =>
+    read((d): Achievement[] => {
+      const c = ctx(d);
+      const txs = liveTx(d, c.familyId);
+      const myTx = txs.filter((t) => t.createdBy === c.member.memberId);
+      if (c.role === 'CHILD') {
+        const myChallenges = d.challenges.filter((x) => x.childMemberId === c.member.memberId);
+        return computeAchievements({ today: today(), myTx, myChallenges });
+      }
+      return computeAchievements({
+        today: today(),
+        myTx,
+        family: {
+          tx: txs,
+          budgets: d.budgets.filter((b) => b.familyId === c.familyId).map((b) => toBudget(d, b)),
+          goals: d.goals
+            .filter((g) => g.familyId === c.familyId)
+            .map((g) => ({ saved: balanceOf(d.accounts.find((a) => a.accountId === g.accountId)!, txs), targetAmount: g.targetAmount, status: g.status })),
+        },
+      });
     }),
 
   // ---- audit log (FR-38)

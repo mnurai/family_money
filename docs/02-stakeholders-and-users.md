@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.2 |
-| **Date** | 2026-11-06 |
+| **Version** | 1.3 |
+| **Date** | 2026-11-13 |
 
 ## 1. Stakeholders
 
@@ -80,6 +80,9 @@ Platform-level role, not part of any family.
 | Block / unblock users | ❌ | ❌ | ❌ | ✅ |
 | Generate password-reset link | ❌ | ❌ | ❌ | ✅ |
 | See family total balance | ✅ | ✅ | ❌ | ❌ |
+| View achievements, points and level (FR-43 – FR-45) | ✅ | ✅ | 🔸 personal badges only | ❌ |
+| Set / cancel a savings challenge for a child (FR-46) | ✅ | ✅ | ❌ | ❌ |
+| View savings challenges (FR-46) | ✅ all | ✅ all | 🔸 own only | ❌ |
 
 > **For Architecture & Security (Nuradin):** this matrix is the source for role-based access control. Every rule here must be enforced on the server, not only hidden in the UI (see NFR-02).
 

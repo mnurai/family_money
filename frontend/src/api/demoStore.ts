@@ -71,6 +71,20 @@ export interface DbBudget {
   createdBy: number;
 }
 export interface DbGoal { goalId: number; familyId: number; accountId: number; name: string; targetAmount: Tiyn; targetDate: string | null; status: GoalStatus; createdBy: number }
+/** FR-46, BR-32: a parent's savings challenge for a child, on an account shared with that child. */
+export interface DbChallenge {
+  challengeId: number;
+  familyId: number;
+  childMemberId: number;
+  accountId: number;
+  name: string;
+  targetAmount: Tiyn;
+  targetDate: string | null;
+  status: GoalStatus;
+  createdBy: number;
+  createdAt: string;
+  achievedAt: string | null;
+}
 export interface DbNotification { notificationId: number; memberId: number; type: NotificationType; message: string; isRead: boolean; createdAt: string }
 export interface DbAudit {
   logId: number;
@@ -99,6 +113,7 @@ export interface Db {
   transactions: DbTransaction[];
   budgets: DbBudget[];
   goals: DbGoal[];
+  challenges: DbChallenge[];
   notifications: DbNotification[];
   audit: DbAudit[];
 }
@@ -126,7 +141,8 @@ export function loadDb(): Db | null {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const db = JSON.parse(raw) as Db;
-    return db.version === 1 ? db : null;
+    // Data saved before savings challenges existed is re-seeded, so the demo shows one.
+    return db.version === 1 && Array.isArray(db.challenges) ? db : null;
   } catch {
     return null;
   }
@@ -138,6 +154,8 @@ export function saveDb(db: Db): void {
 
 export function clearDb(): void {
   localStorage.removeItem(STORAGE_KEY);
+  // Forget which badges and milestones were already celebrated, so a reset demo can celebrate again.
+  for (const key of Object.keys(localStorage)) if (key.startsWith('fbt.celebrated.')) localStorage.removeItem(key);
 }
 
 const kzt = (n: number): Tiyn => n * 100;
@@ -293,6 +311,11 @@ export async function seedDb(): Promise<Db> {
     { goalId: next(), familyId: fid, accountId: savings.accountId, name: 'Summer trip', targetAmount: kzt(600_000), targetDate: tripDate, status: 'ACTIVE', createdBy: aigerim.memberId },
   ];
 
+  // Aidar saves pocket money for headphones (persona, doc 02 §4): 12 500 of 25 000 = 50 %.
+  const challenges: DbChallenge[] = [
+    { challengeId: next(), familyId: fid, childMemberId: aidar.memberId, accountId: pocket.accountId, name: 'Headphones', targetAmount: kzt(25_000), targetDate: `${shiftMonth(thisMonth, 2)}-01`, status: 'ACTIVE', createdBy: aigerim.memberId, createdAt: joined, achievedAt: null },
+  ];
+
   const foodAlert = `Food budget is 83 % used (${formatMoney(kzt(50_000))} of ${formatMoney(kzt(60_000))})`;
   const alertTime = `${tm(4)}T12:01:00.000Z`;
   const housingAlert = `Housing & utilities budget is 80 % used (${formatMoney(kzt(120_000))} of ${formatMoney(kzt(150_000))})`;
@@ -347,6 +370,7 @@ export async function seedDb(): Promise<Db> {
     transactions,
     budgets,
     goals,
+    challenges,
     notifications,
     audit,
   };
