@@ -46,7 +46,7 @@ def get_current_principal() -> Principal:
     raise RuntimeError("get_current_principal must be overridden by the authentication")
 
 
-def require(action: str):
+def require(action: str): #Проверка прав для запросов а сам require проверка на роль имеет ли он права
     """Dependency: the logged-in user must be allowed to do `action` (permission matrix)."""
 
     def dependency(principal: Principal = Depends(get_current_principal)) -> Principal:
