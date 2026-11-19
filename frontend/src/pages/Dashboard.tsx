@@ -7,6 +7,48 @@ import { AccountIcon, ACCOUNT_LABEL, budgetTone, Empty, Money, Progress, Skeleto
 import { currentMonth, formatMonth, monthRange } from '../lib/dates';
 import { useLoad, useMember } from '../state/session';
 import { useRefData } from '../state/refdata';
+import { BadgeIcon } from '../components/Achievements';
+import { MyChallenge } from '../components/Challenges';
+import { levelOf } from '../lib/achievements';
+import type { Achievement } from '../api';
+
+/** FR-43: earned count, the badges earned so far and the closest one to earn next. */
+function AchievementsCard({ badges }: { badges: Achievement[] }) {
+  const earned = badges.filter((b) => b.earned);
+  const next = badges
+    .filter((b) => !b.earned)
+    .sort((a, b) => b.progress.current / b.progress.target - a.progress.current / a.progress.target)[0];
+  return (
+    <div className="card">
+      <div className="card-head">
+        <h2>Achievements</h2>
+        <Link to="/achievements" className="btn btn-ghost btn-sm">All <ChevronRight size={14} /></Link>
+      </div>
+      <div className="card-body stack">
+        <div className="row-between">
+          <strong>Level {levelOf(badges).level} · {levelOf(badges).name}</strong>
+          <span className="muted small num">{levelOf(badges).points} pts · {earned.length} of {badges.length} badges</span>
+        </div>
+        <div className="row wrap" style={{ gap: 8 }}>
+          {earned.map((b) => (
+            <span key={b.id} title={b.title}>
+              <BadgeIcon badge={b} size="sm" />
+            </span>
+          ))}
+          {earned.length === 0 && <span className="muted small">No badges yet. Record a transaction to earn the first one.</span>}
+        </div>
+        {next && (
+          <div className="stack" style={{ gap: 6 }}>
+            <span className="small">
+              Next: <strong>{next.title}</strong> <span className="muted">· {next.description}</span>
+            </span>
+            {next.progress.target > 1 && <Progress percent={(next.progress.current * 100) / next.progress.target} tone="goal" />}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export function DashboardPage() {
   const { member, isGrownUp } = useMember();
@@ -16,14 +58,15 @@ export function DashboardPage() {
   const { from, to } = monthRange(month);
 
   const { data } = useLoad(async () => {
-    const [summary, recent, budgets, goals, total] = await Promise.all([
+    const [summary, recent, budgets, goals, total, badges] = await Promise.all([
       api.summary(from, to),
       api.transactions({}),
       isGrownUp ? api.budgets(month) : Promise.resolve([]),
       isGrownUp ? api.goals() : Promise.resolve([]),
       isGrownUp ? api.familyTotal() : Promise.resolve(null), // BR-13: never for a child
+      api.achievements(),
     ]);
-    return { summary, recent: recent.slice(0, 6), budgets, goals, total };
+    return { summary, recent: recent.slice(0, 6), budgets, goals, total, badges };
   }, [month, isGrownUp]);
 
   const accounts = refData.accounts.filter((a) => !a.isArchived);
@@ -116,6 +159,8 @@ export function DashboardPage() {
         </div>
 
         <div className="stack" style={{ gap: 16 }}>
+          {!isGrownUp && <MyChallenge />}
+
           {isGrownUp && (
             <div className="card">
               <div className="card-head">
@@ -170,6 +215,8 @@ export function DashboardPage() {
               </div>
             </div>
           )}
+
+          {data && data.badges.length > 0 && <AchievementsCard badges={data.badges} />}
 
           {data && data.summary.byCategory.length > 0 && (
             <div className="card">

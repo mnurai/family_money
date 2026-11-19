@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.2 |
-| **Date** | 2026-11-06 |
+| **Version** | 1.3 |
+| **Date** | 2026-11-13 |
 
 Business rules are constraints that the system must always respect, no matter which screen or API is used. Each rule should be enforced in the backend (Application & Development), where possible also as a database constraint (Data & Database), and verified by at least one test case (Testing).
 
@@ -77,6 +77,15 @@ Business rules are constraints that the system must always respect, no matter wh
 | ID | Rule | Enforcement |
 |---|---|---|
 | BR-28 | A refund for an earlier purchase is recorded as an `INCOME` transaction in the default category **"Refunds"** (D-1). The original expense is not edited, and the budget of the original category is **not** reduced. If the purchase itself was a mistake, the user edits or deletes the original expense instead (BR-11). | APP |
+
+## 9. Gamification
+
+| ID | Rule | Enforcement |
+|---|---|---|
+| BR-29 | Badges and goal milestones are **derived** from stored data each time they are shown; nothing extra is saved and nothing can be "unearned" by hand. Only live (not soft-deleted) transactions count, transfers never count as income or spending (BR-12), and month badges count only months that have ended. A milestone is reached when the linked account balance ≥ target × 25 / 50 / 75 / 100 % (BR-25). | APP |
+| BR-30 | Personal badges use only the transactions the member recorded. Family badges and goal milestones use family-wide data, so they are shown only to the Owner and Adults, never to a Child Member (BR-13). | APP (server) |
+| BR-31 | Points = the sum of the points of the member's **earned** badges; the level follows from the points (1 from 0, 2 from 20, 3 from 50, 4 from 100, 5 from 160). Points and levels are derived like badges (BR-29) and are never entered by hand. Family badges count for every Owner and Adult of the family. | APP |
+| BR-32 | A savings challenge is set by the Owner or an Adult for one Child Member, on an account that is shared with that child (FR-13) and not archived. The target must be greater than 0 and greater than the account's current balance; the target date, if given, cannot be in the past. A child has at most one ACTIVE challenge. Progress = balance of the linked account (as BR-25); when it reaches the target the challenge becomes ACHIEVED and stays so. The challenge is CANCELLED automatically when the account is no longer shared with the child, the account is archived, or the child is removed or stops being a Child. A Child sees only their own challenges. | DB (partial UNIQUE) + APP |
 
 ## Worked example (for testing)
 

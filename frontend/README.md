@@ -62,6 +62,7 @@ src/
 | Family | FR-06, FR-08, BR-18 – BR-20 |
 | Notifications | FR-35 |
 | Audit log | FR-38, BR-27 |
+| Achievements, level chip; goal milestones and kids' challenges on Goals; child's challenge on Overview | FR-43 – FR-46, BR-29 – BR-32 |
 
 Not built yet: custom categories (FR-15), recurring transactions (FR-22, FR-23), ownership
 transfer (FR-09), profile editing (FR-04), the system administrator screens (FR-03, FR-39).

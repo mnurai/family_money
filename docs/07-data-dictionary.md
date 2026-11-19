@@ -4,8 +4,8 @@
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
 | **Handed over to** | Gulnaz Bekturgan — Data & Database (physical design, SQL schema) |
-| **Version** | 1.2 |
-| **Date** | 2026-11-05 |
+| **Version** | 1.3 |
+| **Date** | 2026-11-13 |
 
 This is the **logical** data model derived from the requirements. The database engine is **PostgreSQL** (decision D-4), so types are given as PostgreSQL types. Data & Database decides the remaining physical details (indexes, naming, migrations). The ER diagram is in [diagrams/erd.md](diagrams/erd.md).
 
@@ -30,6 +30,7 @@ This is the **logical** data model derived from the requirements. The database e
 | RECURRING_RULE | Template that creates transactions on a schedule | FR-22, FR-23 |
 | BUDGET | Monthly limit for one expense category | FR-24 – FR-27 |
 | SAVINGS_GOAL | Target amount linked to a savings account | FR-28, FR-29 |
+| SAVINGS_CHALLENGE | A parent's savings target for a child, on an account shared with that child | FR-46 |
 | NOTIFICATION | In-app message to a member (no email in v1) | FR-35 |
 | AUDIT_LOG | Append-only record of changes | FR-37, FR-38 |
 
@@ -214,6 +215,26 @@ CHECK (
 | target_date | date? | | |
 | status | goal_status | NN, default ACTIVE | |
 | created_by | integer | FK → FAMILY_MEMBER, NN | |
+
+## SAVINGS_CHALLENGE
+
+Added in v1.3 (FR-46, BR-32). Badges, points and levels (FR-43 – FR-45) need no table: they are derived from existing data (BR-29, BR-31).
+
+| Attribute | Type | Constraints | Description |
+|---|---|---|---|
+| challenge_id | integer | PK | |
+| family_id | integer | FK → FAMILY, NN | |
+| child_member_id | integer | FK → FAMILY_MEMBER, NN | Must have role CHILD |
+| account_id | integer | FK → ACCOUNT, NN | Must be shared with the child (ACCOUNT_ACCESS) |
+| name | varchar(100) | NN | e.g. "Headphones" |
+| target_amount | numeric(14,2) | NN, CHECK > 0 | |
+| target_date | date? | | |
+| status | goal_status | NN, default ACTIVE | **Partial UQ** (child_member_id) WHERE status = 'ACTIVE' |
+| created_by | integer | FK → FAMILY_MEMBER, NN | Owner or Adult |
+| created_at | timestamptz | NN | |
+| achieved_at | timestamptz? | | Set when the target is reached |
+
+Completing a challenge sends a `GOAL_ACHIEVED` notification with `related_entity = 'SAVINGS_CHALLENGE'`, so `notification_type` does not change.
 
 ## NOTIFICATION
 
