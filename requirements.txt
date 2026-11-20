@@ -3,3 +3,6 @@ sqlalchemy>=2.0
 psycopg[binary]
 pytest
 httpx
+
+argon2-cffi
+pyjwt
