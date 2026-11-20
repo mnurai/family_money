@@ -2,6 +2,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { Layout } from './components/Layout';
 import { AccountsPage } from './pages/Accounts';
+import { AchievementsPage } from './pages/Achievements';
 import { AuditPage } from './pages/Audit';
 import { LoginPage, RegisterPage } from './pages/Auth';
 import { BudgetsPage } from './pages/Budgets';
@@ -50,6 +51,7 @@ export function App() {
         <Route path="budgets" element={<RequireRole roles={['OWNER', 'ADULT']}><BudgetsPage /></RequireRole>} />
         <Route path="goals" element={<RequireRole roles={['OWNER', 'ADULT']}><GoalsPage /></RequireRole>} />
         <Route path="reports" element={<ReportsPage />} />
+        <Route path="achievements" element={<AchievementsPage />} />
         <Route path="members" element={<MembersPage />} />
         <Route path="audit" element={<RequireRole roles={['OWNER']}><AuditPage /></RequireRole>} />
       </Route>

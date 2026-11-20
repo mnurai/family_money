@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.2 |
-| **Date** | 2026-11-06 |
+| **Version** | 1.3 |
+| **Date** | 2026-11-13 |
 
 ## 1. Introduction
 
@@ -108,7 +108,18 @@ This document lists the functional and non-functional requirements of the Family
 | FR-38 | The system shall allow the Owner to view the audit log of their family. | C |
 | FR-39 | The system shall allow the System Administrator to block and unblock user accounts. | S |
 
-### 2.11 Won't have in v1
+### 2.11 Gamification (GAM)
+
+Added in v1.3 at the course teacher's request. Badges and milestones are calculated from data the system already stores; nothing extra is recorded (BR-29).
+
+| ID | Requirement | Priority |
+|---|---|:-:|
+| FR-43 | The system shall award achievement badges for good money habits: personal badges for what a member records, and family badges (budgets, goals, monthly results) for the Owner and Adults. Each badge shows its progress and, once earned, the date it was earned. A newly earned badge is celebrated with an in-app message. | S |
+| FR-44 | The system shall show savings-goal milestones at 25 %, 50 %, 75 % and 100 % of the target, how much is left to the next milestone, and celebrate each newly reached milestone with an in-app message. | S |
+| FR-45 | The system shall give each badge a number of points and show the member's total points and level (1 Beginner, 2 Learner, 3 Saver, 4 Budget pro, 5 Money master) next to their name, with the points needed for the next level. Reaching a new level is celebrated with an in-app message. | S |
+| FR-46 | The system shall allow the Owner and Adults to set a savings challenge for a Child Member on an account shared with that child (name, target amount, optional target date). The child sees the challenge with its progress and milestones; reaching the target completes it and notifies the child and the Owner and Adults. | S |
+
+### 2.12 Won't have in v1
 
 | ID | Requirement | Priority |
 |---|---|:-:|
@@ -164,6 +175,6 @@ This document lists the functional and non-functional requirements of the Family
 | Priority | Functional | Non-functional |
 |---|:-:|:-:|
 | Must | 18 | 8 |
-| Should | 15 | 10 |
+| Should | 19 | 10 |
 | Could | 5 | 2 |
 | Won't | 4 | 0 |

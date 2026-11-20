@@ -23,6 +23,9 @@ erDiagram
     CATEGORY |o--o{ CATEGORY : "parent of"
     CATEGORY ||--o{ BUDGET : "limited by"
     ACCOUNT ||--o| SAVINGS_GOAL : "funds"
+    FAMILY ||--o{ SAVINGS_CHALLENGE : "sets"
+    ACCOUNT ||--o{ SAVINGS_CHALLENGE : "funds"
+    FAMILY_MEMBER ||--o{ SAVINGS_CHALLENGE : "takes on (child)"
     ACCOUNT ||--o{ ACCOUNT_ACCESS : "shared via"
     FAMILY_MEMBER ||--o{ ACCOUNT_ACCESS : "gets"
     FAMILY_MEMBER ||--o{ TRANSACTION : "records"
@@ -109,6 +112,14 @@ erDiagram
     SAVINGS_GOAL {
         int goal_id PK
         int account_id FK, UK
+        string name
+        decimal target_amount
+        string status "ACTIVE, ACHIEVED, CANCELLED"
+    }
+    SAVINGS_CHALLENGE {
+        int challenge_id PK
+        int child_member_id FK
+        int account_id FK
         string name
         decimal target_amount
         string status "ACTIVE, ACHIEVED, CANCELLED"

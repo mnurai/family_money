@@ -5,3 +5,4 @@ import { demoApi } from './demoApi';
 
 export const api = demoApi;
 export * from './types';
+export type { Achievement, AchievementId } from '../lib/achievements';

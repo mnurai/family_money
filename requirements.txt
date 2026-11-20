@@ -2,3 +2,5 @@ fastapi
 sqlalchemy>=2.0
 psycopg[binary]
 pytest
+httpx
+uvicorn

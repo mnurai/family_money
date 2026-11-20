@@ -125,6 +125,21 @@ export interface Goal {
   saved: Tiyn;
 }
 
+/** FR-46: a savings challenge a parent sets for a child (BR-32). */
+export interface Challenge {
+  challengeId: number;
+  childMemberId: number;
+  childName: string;
+  accountId: number;
+  accountName: string;
+  name: string;
+  targetAmount: Tiyn;
+  targetDate: string | null;
+  status: GoalStatus;
+  /** Balance of the linked account (like BR-25). */
+  saved: Tiyn;
+}
+
 export interface Invitation {
   invitationId: number;
   familyId: number;
