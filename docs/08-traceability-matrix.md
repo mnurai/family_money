@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.4 |
+| **Version** | 1.5 |
 | **Date** | 2026-11-20 |
 
 The matrix links every requirement to the use case and user story it comes from, the business rules and data it depends on, the team member who implements it and the test that verifies it. **Test case IDs are reserved here; the Testing role fills in the test details and the Status column.**
@@ -66,6 +66,9 @@ The matrix links every requirement to the use case and user story it comes from,
 | FR-44 | Savings-goal milestones | S | UC-10 | US-27 | BR-25, BR-29, BR-30 | SAVINGS_GOAL, ACCOUNT | SA (frontend), AD | TC-44 | 🟨 |
 | FR-45 | Points and levels | S | — | US-28 | BR-29, BR-31 | TRANSACTION, BUDGET, SAVINGS_GOAL | SA (frontend), AD | TC-45 | 🟨 |
 | FR-46 | Kids' savings challenge | S | — | US-29 | BR-10, BR-25, BR-32 | SAVINGS_CHALLENGE, ACCOUNT, ACCOUNT_ACCESS, NOTIFICATION | SA (frontend), AD, DB | TC-46 | 🟨 |
+| FR-47 | Goal contributions per member | S | UC-10 | US-30 | BR-07, BR-13, BR-25, BR-33 | SAVINGS_GOAL, TRANSACTION, FAMILY_MEMBER | SA (frontend), AD | TC-47 | 🟨 |
+| FR-48 | Family leaderboard | S | — | US-31 | BR-30, BR-31, BR-34 | FAMILY_MEMBER, TRANSACTION | SA (frontend), AD | TC-48 | 🟨 |
+| FR-49 | Monthly family challenge | S | — | US-32 | BR-12, BR-13, BR-35 | FAMILY_CHALLENGE, TRANSACTION, ACCOUNT, NOTIFICATION | SA (frontend), AD, DB | TC-49 | 🟨 |
 
 ## Non-functional requirements
 
@@ -99,5 +102,5 @@ The matrix links every requirement to the use case and user story it comes from,
 - Every Must requirement has at least one use case or user story ✅
 - Every use case is linked to at least one requirement ✅
 - FR-36 (email) is Won't in v1 (D-3) and is not traced
-- Every business rule BR-01 – BR-32 is referenced by at least one requirement ✅
+- Every business rule BR-01 – BR-35 is referenced by at least one requirement ✅
 - Every entity in the data dictionary is used by at least one requirement ✅

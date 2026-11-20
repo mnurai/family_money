@@ -26,6 +26,7 @@ erDiagram
     FAMILY ||--o{ SAVINGS_CHALLENGE : "sets"
     ACCOUNT ||--o{ SAVINGS_CHALLENGE : "funds"
     FAMILY_MEMBER ||--o{ SAVINGS_CHALLENGE : "takes on (child)"
+    FAMILY ||--o{ FAMILY_CHALLENGE : "takes on (monthly)"
     ACCOUNT ||--o{ ACCOUNT_ACCESS : "shared via"
     FAMILY_MEMBER ||--o{ ACCOUNT_ACCESS : "gets"
     FAMILY_MEMBER ||--o{ TRANSACTION : "records"
@@ -120,6 +121,14 @@ erDiagram
         int challenge_id PK
         int child_member_id FK
         int account_id FK
+        string name
+        decimal target_amount
+        string status "ACTIVE, ACHIEVED, CANCELLED"
+    }
+    FAMILY_CHALLENGE {
+        int family_challenge_id PK
+        int family_id FK
+        date period_month
         string name
         decimal target_amount
         string status "ACTIVE, ACHIEVED, CANCELLED"

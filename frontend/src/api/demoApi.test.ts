@@ -147,6 +147,59 @@ describe('rules', () => {
     expect(await api.challenges()).toEqual([]);
   });
 
+  it('fr47 a shared goal shows what each parent put in', async () => {
+    await api.login('aigerim@mail.kz', DEMO_PASSWORD);
+    const [trip] = await api.goals();
+    expect(trip.contributions.members.map((m) => [m.name, m.amount / 100])).toEqual([
+      ['Aigerim Seitkali', 200_000],
+      ['Daulet Seitkali', 50_000],
+    ]);
+    expect(trip.contributions.starting + trip.contributions.members.reduce((s, m) => s + m.amount, 0) - trip.contributions.takenOut).toBe(trip.saved);
+  });
+
+  it('br34 every member, a child included, sees the leaderboard without money amounts', async () => {
+    await api.login('aidar@mail.kz', DEMO_PASSWORD);
+    const board = await api.leaderboard();
+    expect(board).toHaveLength(3);
+    expect(board.find((r) => r.isMe)!.role).toBe('CHILD');
+    expect(board.map((r) => r.points)).toEqual([...board.map((r) => r.points)].sort((a, b) => b - a));
+    for (const r of board) expect(Object.keys(r).sort()).toEqual(['badgesEarned', 'isMe', 'level', 'levelName', 'memberId', 'name', 'points', 'rank', 'role']);
+  });
+
+  it('br35 a child sees the family challenge as a percentage only and cannot set one', async () => {
+    await api.login('aidar@mail.kz', DEMO_PASSWORD);
+    const [ch] = await api.familyChallenges();
+    expect(ch).toMatchObject({ name: 'Save together', percent: 75, targetAmount: null, saved: null, members: null });
+    await expect(api.createFamilyChallenge({ name: 'X', targetAmount: kzt(1_000) })).rejects.toThrow('Only the owner and adults can set family challenges');
+  });
+
+  it('fr49 one challenge a month; reaching the target completes it, tells everyone and earns the badge', async () => {
+    await api.login('aigerim@mail.kz', DEMO_PASSWORD);
+    await expect(api.createFamilyChallenge({ name: 'Again', targetAmount: kzt(1_000) })).rejects.toThrow('This month already has a family challenge');
+    const [ch] = await api.familyChallenges();
+    expect(ch).toMatchObject({ result: 'ACTIVE', saved: kzt(150_000), targetAmount: kzt(200_000) });
+    expect((await api.achievements()).find((b) => b.id === 'SAVED_TOGETHER')!.earned).toBe(false);
+    const accounts = await api.accounts();
+    const id = (name: string) => accounts.find((a) => a.name === name)!.accountId;
+    await api.createTransaction({ type: 'TRANSFER', amount: kzt(50_000), sourceAccountId: id('Kaspi card'), destinationAccountId: id('Savings'), categoryId: null, transactionDate: d, description: null });
+    expect((await api.familyChallenges())[0]).toMatchObject({ result: 'ACHIEVED', percent: 100 });
+    expect((await api.achievements()).find((b) => b.id === 'SAVED_TOGETHER')!.earned).toBe(true);
+    expect((await api.notifications())[0].message).toContain('together you saved');
+    await api.logout();
+    await api.login('aidar@mail.kz', DEMO_PASSWORD);
+    const msg = (await api.notifications())[0].message;
+    expect(msg).toBe('Family challenge “Save together” complete! Great teamwork.');
+  });
+
+  it('br35 after cancelling, a new challenge can be set for the same month', async () => {
+    await api.login('daulet@mail.kz', DEMO_PASSWORD);
+    const [ch] = await api.familyChallenges();
+    await api.cancelFamilyChallenge(ch.familyChallengeId);
+    expect(await api.familyChallenges()).toEqual([]);
+    await api.createFamilyChallenge({ name: 'Trip fund', targetAmount: kzt(300_000) });
+    expect((await api.familyChallenges())[0]).toMatchObject({ name: 'Trip fund', result: 'ACTIVE' });
+  });
+
   it('br11 an adult cannot edit a transaction recorded by someone else', async () => {
     await api.login('daulet@mail.kz', DEMO_PASSWORD);
     const me = (await api.me())!.member!;

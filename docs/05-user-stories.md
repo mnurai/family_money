@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.4 |
-| **Date** | 2026-11-13 |
+| **Version** | 1.5 |
+| **Date** | 2026-11-20 |
 
 Format: *As a ⟨role⟩, I want ⟨goal⟩, so that ⟨benefit⟩.* Acceptance criteria use **Given / When / Then** so that the Testing role can turn them directly into test cases. Each story is also created as a GitHub Issue (see `scripts/create_issues.sh`).
 
@@ -275,6 +275,34 @@ Story points: 1 = a few hours, 2 = about a day, 3 = 2–3 days, 5 = a week.
   4. When the account balance reaches the target, the challenge is complete; Aidar and the Owner and Adults get a notification, and Aidar earns the "Challenge champion" badge.
   5. A Child Member cannot create or cancel challenges (403). If the account stops being shared with the child, the challenge is cancelled.
 
+### US-30 — Save together towards one goal
+*As a parent, I want to see how much my spouse and I have each put into our savings goal, so that we can save for a family trip together.*
+- **Links:** FR-47, BR-33, BR-25 · **Priority:** S · **Points:** 2
+- **Acceptance criteria**
+  1. **Given** the goal "Summer trip" on the account "Savings", **when** Aigerim transfers 200 000 ₸ and Daulet transfers 50 000 ₸ into it, **then** the goal card shows "Aigerim 200 000,00 ₸" and "Daulet 50 000,00 ₸", with Aigerim marked as the top saver.
+  2. Each member's share is shown as a part of one bar, and the shares plus the starting balance minus money taken out equal the goal's progress.
+  3. A deleted transfer no longer counts towards anyone's contribution (BR-07).
+  4. A Child Member cannot see goals or contributions (BR-13).
+
+### US-31 — Family leaderboard
+*As a family member, I want to see how my points compare with the rest of my family, so that saving feels like a friendly game.*
+- **Links:** FR-48, BR-34, BR-31 · **Priority:** S · **Points:** 1
+- **Acceptance criteria**
+  1. The Achievements page shows every current family member with level, points and number of badges, highest points first, and highlights me.
+  2. Equal points are ordered by name; removed members are not shown.
+  3. The leaderboard shows no money amounts, and a Child Member sees it too.
+
+### US-32 — Monthly family challenge
+*As a parent, I want to set a savings challenge for the whole family for this month, so that we all work towards it together.*
+- **Links:** FR-49, BR-35, BR-12, BR-13 · **Priority:** S · **Points:** 3
+- **Acceptance criteria**
+  1. **Given** no challenge for this month, **when** I set "Save together" with a target of 200 000 ₸, **then** every member sees it on the Achievements page with one shared progress bar.
+  2. A second challenge in the same month is refused with "This month already has a family challenge".
+  3. Only transfers from a non-savings account into a Savings account in this month count; money moved back out of savings is subtracted, and income and expenses never count.
+  4. When progress reaches the target, the challenge is complete, every member gets a notification, and the Owner and Adults earn the "Saved together" badge.
+  5. A Child Member sees the name and percentage only, without amounts, and cannot create or cancel a challenge (403).
+  6. A challenge that was not reached by the end of its month is shown as "Not reached".
+
 ## Backlog summary
 
 | Epic | Stories | Total points |
@@ -284,5 +312,5 @@ Story points: 1 = a few hours, 2 = about a day, 3 = 2–3 days, 5 = a week.
 | E3 Budgets and goals | US-14 – US-16, US-24 | 9 |
 | E4 Reports | US-17 – US-19, US-25 | 9 |
 | E5 Administration | US-20, US-26 | 3 |
-| E6 Gamification | US-27 – US-29 | 8 |
-| **Total** | **29** | **66** |
+| E6 Gamification | US-27 – US-32 | 14 |
+| **Total** | **32** | **72** |

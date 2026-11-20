@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.3 |
-| **Date** | 2026-11-13 |
+| **Version** | 1.4 |
+| **Date** | 2026-11-20 |
 
 Business rules are constraints that the system must always respect, no matter which screen or API is used. Each rule should be enforced in the backend (Application & Development), where possible also as a database constraint (Data & Database), and verified by at least one test case (Testing).
 
@@ -86,6 +86,9 @@ Business rules are constraints that the system must always respect, no matter wh
 | BR-30 | Personal badges use only the transactions the member recorded. Family badges and goal milestones use family-wide data, so they are shown only to the Owner and Adults, never to a Child Member (BR-13). | APP (server) |
 | BR-31 | Points = the sum of the points of the member's **earned** badges; the level follows from the points (1 from 0, 2 from 20, 3 from 50, 4 from 100, 5 from 160). Points and levels are derived like badges (BR-29) and are never entered by hand. Family badges count for every Owner and Adult of the family. | APP |
 | BR-32 | A savings challenge is set by the Owner or an Adult for one Child Member, on an account that is shared with that child (FR-13) and not archived. The target must be greater than 0 and greater than the account's current balance; the target date, if given, cannot be in the past. A child has at most one ACTIVE challenge. Progress = balance of the linked account (as BR-25); when it reaches the target the challenge becomes ACHIEVED and stays so. The challenge is CANCELLED automatically when the account is no longer shared with the child, the account is archived, or the child is removed or stops being a Child. A Child sees only their own challenges. | DB (partial UNIQUE) + APP |
+| BR-33 | A member's **contribution** to a savings goal = the sum of live `INCOME` and incoming `TRANSFER` transactions into the goal's linked account that the member recorded. The account's opening balance is shown as "Starting balance" and outgoing transfers as "Taken out", so starting balance + contributions − taken out = progress (BR-25). Contributions are family data and are shown only to the Owner and Adults (BR-13). | APP (server) |
+| BR-34 | The family leaderboard lists every current (not removed) member of the family, ranked by points (BR-31) from high to low; equal points are ordered by name. It shows only name, role, level, points and the number of earned badges, never money amounts, so every member, a Child included, may see it. A Child's points come from personal badges only (BR-30). | APP (server) |
+| BR-35 | A family challenge is set by the Owner or an Adult for the **current** calendar month; a family has at most one challenge per month that is not CANCELLED. The name is required (max 100 characters) and the target must be greater than 0. Progress = live `TRANSFER`s dated in that month from a non-savings account **into** a Savings account, minus live `TRANSFER`s dated in that month from a Savings account to a non-savings account, never below 0. Transfers between two Savings accounts, `INCOME` and `EXPENSE` never count. When progress reaches the target the challenge becomes ACHIEVED and stays so, and every member is notified. A challenge that is still ACTIVE after its month has ended is shown as "Not reached" (derived, not stored). A Child sees the name and the percentage only, never amounts or who saved how much (BR-13). Each ACHIEVED family challenge earns the family badge "Saved together" (FR-43, BR-30). | DB (partial UNIQUE) + APP |
 
 ## Worked example (for testing)
 

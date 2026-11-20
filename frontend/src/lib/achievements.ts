@@ -17,7 +17,8 @@ export type AchievementId =
   | 'DREAMER'
   | 'HALFWAY'
   | 'GOAL_REACHED'
-  | 'CHALLENGE_CHAMPION';
+  | 'CHALLENGE_CHAMPION'
+  | 'SAVED_TOGETHER';
 
 export interface Achievement {
   id: AchievementId;
@@ -49,6 +50,8 @@ export interface AchievementInput {
     budgets: { periodMonth: string; percentUsed: number }[];
     /** Every goal ever created, cancelled ones included. */
     goals: { saved: Tiyn; targetAmount: Tiyn; status: 'ACTIVE' | 'ACHIEVED' | 'CANCELLED' }[];
+    /** Monthly family challenges (FR-49); optional so older callers keep working. */
+    familyChallenges?: { status: 'ACTIVE' | 'ACHIEVED' | 'CANCELLED' }[];
   };
   /** Savings challenges set for this member; only for a Child (FR-46). */
   myChallenges?: { status: 'ACTIVE' | 'ACHIEVED' | 'CANCELLED' }[];
@@ -68,6 +71,7 @@ export const BADGE_POINTS: Record<AchievementId, number> = {
   HALFWAY: 25,
   GOAL_REACHED: 50,
   CHALLENGE_CHAMPION: 40,
+  SAVED_TOGETHER: 30,
 };
 
 export const REGULAR_TARGET = 25;
@@ -141,7 +145,7 @@ export function computeAchievements({ today, myTx, family, myChallenges }: Achie
   }
   if (!family) return list;
 
-  const { tx, budgets, goals } = family;
+  const { tx, budgets, goals, familyChallenges = [] } = family;
 
   // A finished month where every budget stayed at or under its limit (BR-15 spending, 100 % allowed).
   const budgetMonths = [...new Set(budgets.map((b) => b.periodMonth))].filter((m) => m < monthKey(today)).sort();
@@ -166,6 +170,7 @@ export function computeAchievements({ today, myTx, family, myChallenges }: Achie
     badge('DREAMER', 'Dreamer', 'Create a savings goal.', 'FAMILY', goals.length > 0 ? 1 : 0, 1),
     badge('HALFWAY', 'Halfway there', 'Save half of a goal’s target.', 'FAMILY', Math.min(bestGoalPct, 100), 50),
     badge('GOAL_REACHED', 'Goal reached', 'Reach the target of a savings goal.', 'FAMILY', bestGoalPct, 100),
+    badge('SAVED_TOGETHER', 'Saved together', 'Complete a monthly family challenge.', 'FAMILY', familyChallenges.filter((c) => c.status === 'ACHIEVED').length, 1),
   );
   return list;
 }
