@@ -1,7 +1,9 @@
 // FR-43, FR-45: achievement badges, points and levels. Personal badges for everyone, family badges for Owner and Adults (BR-30).
+// FR-48, FR-49: the family leaderboard and the monthly family challenge.
 
 import { api } from '../api';
 import { BadgeCard, LevelCard } from '../components/Achievements';
+import { FamilyChallengeSection, Leaderboard } from '../components/SaveTogether';
 import { ErrorAlert, Skeleton } from '../components/ui';
 import { levelOf, LEVELS } from '../lib/achievements';
 import { useLoad, useMember } from '../state/session';
@@ -37,6 +39,11 @@ export function AchievementsPage() {
                 <strong>{l.level}</strong> {l.name} <em className="num">{l.from} pts</em>
               </span>
             ))}
+          </div>
+
+          <div className="grid grid-2 align-start">
+            <FamilyChallengeSection />
+            <Leaderboard />
           </div>
 
           <section>

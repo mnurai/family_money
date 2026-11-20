@@ -123,6 +123,39 @@ export interface Goal {
   status: GoalStatus;
   /** Linked savings account balance (BR-25). */
   saved: Tiyn;
+  /** FR-47, BR-33: who put how much into the linked account. */
+  contributions: {
+    starting: Tiyn;
+    members: { memberId: number; name: string; amount: Tiyn }[];
+    takenOut: Tiyn;
+  };
+}
+
+/** FR-48, BR-34: one row of the family leaderboard. No money amounts. */
+export interface LeaderboardRow {
+  rank: number;
+  memberId: number;
+  name: string;
+  role: MemberRole;
+  points: number;
+  level: number;
+  levelName: string;
+  badgesEarned: number;
+  isMe: boolean;
+}
+
+/** FR-49, BR-35: the monthly family savings challenge. Amounts are null for a Child (BR-13). */
+export interface FamilyChallenge {
+  familyChallengeId: number;
+  /** "2026-11" */
+  month: string;
+  name: string;
+  /** ACHIEVED, ACTIVE (this month) or MISSED (month ended, target not reached; derived). */
+  result: 'ACTIVE' | 'ACHIEVED' | 'MISSED';
+  percent: number;
+  targetAmount: Tiyn | null;
+  saved: Tiyn | null;
+  members: { memberId: number; name: string; amount: Tiyn }[] | null;
 }
 
 /** FR-46: a savings challenge a parent sets for a child (BR-32). */

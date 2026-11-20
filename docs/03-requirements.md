@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.3 |
-| **Date** | 2026-11-13 |
+| **Version** | 1.4 |
+| **Date** | 2026-11-20 |
 
 ## 1. Introduction
 
@@ -118,6 +118,9 @@ Added in v1.3 at the course teacher's request. Badges and milestones are calcula
 | FR-44 | The system shall show savings-goal milestones at 25 %, 50 %, 75 % and 100 % of the target, how much is left to the next milestone, and celebrate each newly reached milestone with an in-app message. | S |
 | FR-45 | The system shall give each badge a number of points and show the member's total points and level (1 Beginner, 2 Learner, 3 Saver, 4 Budget pro, 5 Money master) next to their name, with the points needed for the next level. Reaching a new level is celebrated with an in-app message. | S |
 | FR-46 | The system shall allow the Owner and Adults to set a savings challenge for a Child Member on an account shared with that child (name, target amount, optional target date). The child sees the challenge with its progress and milestones; reaching the target completes it and notifies the child and the Owner and Adults. | S |
+| FR-47 | The system shall show, for each savings goal, how much each family member has put into the linked account and who has contributed the most, so that several members (e.g. both parents) can save towards one goal together. | S |
+| FR-48 | The system shall show a family leaderboard that ranks the current family members by points (FR-45), with each member's level and number of earned badges. | S |
+| FR-49 | The system shall allow the Owner and Adults to set one family savings challenge for the current month (name and target amount). The whole family sees one shared progress bar; reaching the target completes the challenge, notifies every member and earns the family badge "Saved together". | S |
 
 ### 2.12 Won't have in v1
 

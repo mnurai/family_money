@@ -1,7 +1,7 @@
 # Family Budget Tracker — Analysis & Requirements
 
 **Author:** Nuray Mukhambet — Systems Analysis & Requirements
-**Course:** Basics of Information Systems · **Version:** 1.6 · **Date:** 2026-11-20
+**Course:** Basics of Information Systems · **Version:** 1.7 · **Date:** 2026-11-20
 
 This folder contains the systems analysis of the Family Budget Tracker: what the system must do, for whom, under which rules, and with which data. All other parts of the project (architecture, database, application, tests) are built from these documents.
 
@@ -57,3 +57,4 @@ GitHub renders these automatically (Mermaid).
 | 1.4 | 2026-11-06 | Nuray Mukhambet | Resolved test-plan findings I-1, I-4, I-6, I-7, I-10, I-11, I-13 (doc 11 §10): password ≥ 8 with a letter and a digit (US-01.3, doc 10); a Child sees all transactions on shared accounts (BR-10, doc 02, UC-09, US-18, doc 10); scheduler idempotent with catch-up (BR-26, UC-11); one "exceeded" alert when both thresholds are crossed (BR-16, UC-08, US-15); CSV number format (US-19); new stories US-21 – US-26 for FR-04, FR-09, FR-15, FR-27, FR-33, FR-38 (doc 08, create_issues.sh). Docs 02, 06, 08 → v1.2; docs 04, 05 → v1.3 |
 | 1.5 | 2026-11-13 | Nuray Mukhambet | Gamification, added at the course teacher's request: achievement badges (FR-43), savings-goal milestones (FR-44), points and levels (FR-45) and kids' savings challenges (FR-46), all Should; rules BR-29 (badges are derived, ended months only, transfers never count), BR-30 (family badges only for Owner and Adults), BR-31 (points and levels) and BR-32 (challenges); stories US-27 – US-29 in new epic E6; new entity SAVINGS_CHALLENGE (doc 07, ERD); permission-matrix rows for achievements and challenges. Docs 02, 03, 06, 07, 08 → v1.3; doc 05 → v1.4 |
 | 1.6 | 2026-11-20 | Nuray Mukhambet | Team roles: Nuray Mukhambet also owns the frontend (web app in `frontend/`); Application & Development is the backend. Doc 08 → v1.4 (team roles, "SA (frontend)"), doc 10 §1 and §6 frontend stack confirmed (React + TypeScript + Vite) |
+| 1.7 | 2026-11-20 | Nuray Mukhambet | Gamification, part 2: savings goals shared by several members with each member's contribution (FR-47, BR-33), family leaderboard visible to every member (FR-48, BR-34) and a monthly family savings challenge with the family badge "Saved together" (FR-49, BR-35); stories US-30 – US-32; new entity FAMILY_CHALLENGE (doc 07, ERD); permission-matrix rows. Docs 02, 03, 06, 07 → v1.4; docs 05, 08 → v1.5 |

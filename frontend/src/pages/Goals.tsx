@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ArrowLeftRight, CheckCircle2, Plus, Target } from 'lucide-react';
 import { MilestoneBar, NextMilestone } from '../components/Achievements';
 import { KidsChallenges } from '../components/Challenges';
+import { GoalShares } from '../components/SaveTogether';
 import { api } from '../api';
 import { useAddTransaction } from '../components/Layout';
 import { Confirm, Empty, ErrorAlert, Field, Modal, Money, Skeleton, useToast } from '../components/ui';
@@ -25,7 +26,7 @@ export function GoalsPage() {
       <div className="page-head">
         <div>
           <h1>Savings goals</h1>
-          <p>Progress is the balance of the linked savings account. Saving is a transfer, not an expense.</p>
+          <p>Progress is the balance of the linked savings account. Anyone in the family can add money with a transfer, so you can save together.</p>
         </div>
         <button className="btn btn-primary" onClick={() => setAdding(true)}><Plus size={16} /> New goal</button>
       </div>
@@ -67,6 +68,7 @@ export function GoalsPage() {
                   )}
                 </div>
                 {!achieved && <NextMilestone saved={g.saved} target={g.targetAmount} />}
+                <GoalShares goal={g} />
                 <div className="row">
                   {!achieved && (
                     <button className="btn" onClick={() => addTx({ type: 'TRANSFER', toAccountId: g.accountId })}>

@@ -85,6 +85,19 @@ export interface DbChallenge {
   createdAt: string;
   achievedAt: string | null;
 }
+/** FR-49, BR-35: one savings target for the whole family for one month. */
+export interface DbFamilyChallenge {
+  familyChallengeId: number;
+  familyId: number;
+  /** "2026-11" (period_month in the database is the first day of the month). */
+  periodMonth: string;
+  name: string;
+  targetAmount: Tiyn;
+  status: GoalStatus;
+  createdBy: number;
+  createdAt: string;
+  achievedAt: string | null;
+}
 export interface DbNotification { notificationId: number; memberId: number; type: NotificationType; message: string; isRead: boolean; createdAt: string }
 export interface DbAudit {
   logId: number;
@@ -114,6 +127,7 @@ export interface Db {
   budgets: DbBudget[];
   goals: DbGoal[];
   challenges: DbChallenge[];
+  familyChallenges: DbFamilyChallenge[];
   notifications: DbNotification[];
   audit: DbAudit[];
 }
@@ -141,8 +155,8 @@ export function loadDb(): Db | null {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const db = JSON.parse(raw) as Db;
-    // Data saved before savings challenges existed is re-seeded, so the demo shows one.
-    return db.version === 1 && Array.isArray(db.challenges) ? db : null;
+    // Data saved before challenges existed is re-seeded, so the demo shows them.
+    return db.version === 1 && Array.isArray(db.challenges) && Array.isArray(db.familyChallenges) ? db : null;
   } catch {
     return null;
   }
@@ -284,6 +298,7 @@ export async function seedDb(): Promise<Db> {
   tx('EXPENSE', 2_500, tm(4), aidar, { from: pocket, category: fun, description: 'Cinema' });
   tx('TRANSFER', 100_000, tm(5), aigerim, { from: kaspi, to: savings, description: 'Summer trip' });
   tx('EXPENSE', 32_000, tm(5), daulet, { from: credit, category: clothing, description: 'Winter jacket' });
+  tx('TRANSFER', 50_000, tm(6), daulet, { from: kaspi, to: savings, description: 'Summer trip' }); // both parents save for the trip (FR-47)
 
   const budget = (categoryId: number, month: string, limit: number, alert80 = false): DbBudget => ({
     budgetId: next(),
@@ -314,6 +329,11 @@ export async function seedDb(): Promise<Db> {
   // Aidar saves pocket money for headphones (persona, doc 02 §4): 12 500 of 25 000 = 50 %.
   const challenges: DbChallenge[] = [
     { challengeId: next(), familyId: fid, childMemberId: aidar.memberId, accountId: pocket.accountId, name: 'Headphones', targetAmount: kzt(25_000), targetDate: `${shiftMonth(thisMonth, 2)}-01`, status: 'ACTIVE', createdBy: aigerim.memberId, createdAt: joined, achievedAt: null },
+  ];
+
+  // This month the family saves together: 100 000 + 50 000 of 200 000 = 75 % (FR-49).
+  const familyChallenges: DbFamilyChallenge[] = [
+    { familyChallengeId: next(), familyId: fid, periodMonth: thisMonth, name: 'Save together', targetAmount: kzt(200_000), status: 'ACTIVE', createdBy: aigerim.memberId, createdAt: `${tm(1)}T09:00:00.000Z`, achievedAt: null },
   ];
 
   const foodAlert = `Food budget is 83 % used (${formatMoney(kzt(50_000))} of ${formatMoney(kzt(60_000))})`;
@@ -371,6 +391,7 @@ export async function seedDb(): Promise<Db> {
     budgets,
     goals,
     challenges,
+    familyChallenges,
     notifications,
     audit,
   };

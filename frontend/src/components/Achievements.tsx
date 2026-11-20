@@ -9,6 +9,7 @@ import {
   Flag,
   Flame,
   Footprints,
+  HandCoins,
   Lock,
   Medal,
   Mountain,
@@ -40,6 +41,7 @@ const ICON: Record<AchievementId, LucideIcon> = {
   HALFWAY: Mountain,
   GOAL_REACHED: Trophy,
   CHALLENGE_CHAMPION: Medal,
+  SAVED_TOGETHER: HandCoins,
 };
 
 export function BadgeIcon({ badge, size = 'md' }: { badge: Achievement; size?: 'sm' | 'md' }) {

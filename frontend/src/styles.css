@@ -441,3 +441,35 @@ table.table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .stars .on { color: #ffd479; }
 .challenge-done { background: #f7eddd; color: #6b4310; }
 @media (max-width: 880px) { .level-chip { height: 26px; padding: 0 8px; font-size: 12px; } }
+
+/* ---------- saving together: goal shares, family challenge, leaderboard (FR-47 – FR-49) ---------- */
+.align-start { align-items: start; }
+.shares { display: grid; gap: 8px; }
+.share-bar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: var(--line); gap: 2px; }
+.share-bar span { display: block; min-width: 4px; }
+.share-1 { background: var(--brand); }
+.share-2 { background: #d9a35f; }
+.share-3 { background: var(--transfer); }
+.share-4 { background: var(--income); }
+.share-start { background: var(--line-strong); }
+.share-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
+.share-list li { display: flex; align-items: center; gap: 8px; }
+.share-name { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.share-dot { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.top-saver { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #8a5a17; background: #f7eddd; border-radius: 999px; padding: 2px 7px; }
+.challenge-card.family .challenge-top { background: linear-gradient(120deg, var(--transfer) 0%, var(--brand) 100%); }
+.challenge-card.family.done .challenge-top { background: linear-gradient(120deg, #c47f2c 0%, #93621d 100%); }
+.family-status { flex: none; font-weight: 700; font-size: 14px; padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.18); color: #fff; }
+.past-challenges { display: flex; flex-wrap: wrap; gap: 8px; }
+.past-challenges span { font-size: 13px; padding: 5px 10px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--line); color: var(--muted); }
+.past-challenges span.won { background: #f7eddd; border-color: #ecd6b3; color: #6b4310; }
+.leaderboard { overflow: hidden; }
+.leader-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-top: 1px solid var(--line); }
+.leader-row:first-child { border-top: 0; }
+.leader-row.me { background: var(--brand-soft); }
+.leader-rank { width: 28px; height: 28px; flex: none; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; background: var(--surface-2); color: var(--muted); }
+.leader-rank.rank-1 { background: #ffe7b0; color: #8a5a17; }
+.leader-rank.rank-2 { background: #e9ecf3; color: var(--brand); }
+.leader-rank.rank-3 { background: #f6e3d6; color: #8a4b2c; }
+.leader-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.leader-points { font-weight: 700; white-space: nowrap; }
