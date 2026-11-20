@@ -19,7 +19,7 @@ PostgreSQL is decided (D-4). The code in `app/` and `requirements.txt` already u
 | Database access | SQLAlchemy 2 + psycopg | Already in `requirements.txt` |
 | Migrations | Alembic (not yet in the project) | CLAUDE.md says the schema changes only through migrations; owner: Gulnaz |
 | Password hashing | Argon2id (`argon2-cffi`) or bcrypt (not yet in the project) | NFR-01 |
-| Frontend | Responsive web app (React or plain HTML + JS) | NFR-14 (from 360 px wide) |
+| Frontend | React + TypeScript + Vite in `frontend/` (owner: Nuray Mukhambet) | NFR-14 (from 360 px wide); runs on a demo API until the backend endpoints exist |
 | Scheduler | A daily job (APScheduler or cron) that calls the service layer | FR-23, BR-26 |
 | Tests | pytest, test names by rule ID (`test_br10_...`) | NFR-18, CLAUDE.md |
 | Source control | GitHub, pull request + one review | NFR-19 |
@@ -110,7 +110,7 @@ The link has the form `https://<site>/invite/<token>` and `https://<site>/reset/
 
 | # | Question | Who decides |
 |---|---|---|
-| 1 | ~~Confirm the stack in section 1~~ Done: the project code already uses it. Still open: frontend choice and migration tool | Aziza, Gulnaz |
+| 1 | ~~Confirm the stack in section 1~~ Done: the project code already uses it. Frontend: React + TypeScript + Vite (Nuray). Still open: migration tool | Gulnaz |
 | 2 | Doc 07 says `INVITATION.token` is "random secret in the link". Section 5 stores its SHA-256 hash instead. It fits varchar(64), so no schema change, but doc 07 should say so. **Resolved in doc 07 v1.2.** | Gulnaz, Nuray |
 | 3 | NFR-07 needs proof that the user accepted the privacy notice. A column such as `privacy_accepted_at` in USER may be needed. | Gulnaz, Nuray |
 | 4 | ~~Password minimum length~~ **Resolved:** at least 8 characters with a letter and a digit (section 4, PR #6) | Team |

@@ -1,5 +1,7 @@
 # Family Budget Tracker: web app
 
+**Author:** Nuray Mukhambet — Frontend (and Systems Analysis & Requirements)
+
 React 19 + TypeScript + Vite. Responsive from 360 px (NFR-14), English UI (NFR-16).
 
 ```bash

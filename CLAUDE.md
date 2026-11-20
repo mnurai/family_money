@@ -1,7 +1,7 @@
 # CLAUDE.md — Family Budget Tracker
 
 Instructions for Claude Code (and humans) working in this repository.
-Maintained by: Nuray Mukhambet — Systems Analysis & Requirements.
+Maintained by: Nuray Mukhambet — Systems Analysis & Requirements, Frontend.
 
 ## Project
 
