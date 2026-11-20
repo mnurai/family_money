@@ -11,6 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import Account, AccountAccess, AuditLog, Category, Transaction
+from app.services.child_limits import check_child_spending_limit
 
 TRANSACTION_TYPES = ("INCOME", "EXPENSE", "TRANSFER")  # BR-01
 ROLES = ("OWNER", "ADULT", "CHILD")
@@ -151,6 +152,7 @@ def record_transaction(
             source_acc = get_account(db, source_account_id, family_id)
             if is_child:
                 _check_child_access(db, member_id, source_acc)
+                check_child_spending_limit(db, member_id, amount, tx_date)  # monthly limit set by a parent
             _check_can_withdraw(source_acc, amount)
 
         # --- US-09: INCOME (BR-03) ---

@@ -27,6 +27,7 @@ ALLOWED = {
     "edit_account":          {OWNER, ADULT},
     "archive_account":       {OWNER},                   # adult: no archive
     "share_account":         {OWNER},
+    "manage_child_limit":    {OWNER},                   # monthly spending limit of a child
     "view_accounts":         {OWNER, ADULT, CHILD},     # child: shared accounts only, see can_use_account
     # --- Transactions ---
     "record_income_expense": {OWNER, ADULT, CHILD},     # child: shared accounts only, see can_use_account
