@@ -4,3 +4,8 @@ __pycache__/
 venv/
 .pytest_cache/
 .env
+
+# Bot settings with secrets (only .env.example is committed)
+env
+.env.*
+!.env.example
