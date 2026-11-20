@@ -132,6 +132,14 @@ def test_only_admin_can_block_user_and_create_reset_link():
         assert can("CHILD", action) is False
 
 
+# --- Child spending limit ---
+
+def test_only_owner_can_manage_child_limit():
+    assert can("OWNER", "manage_child_limit") is True
+    for role in ("ADULT", "CHILD", "ADMIN", None):
+        assert can(role, "manage_child_limit") is False
+
+
 # --- Safety ---
 
 def test_unknown_action_and_unknown_role_are_refused():
