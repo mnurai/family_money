@@ -32,4 +32,4 @@ python -m bot.demo low      # -> low-balance alert
 
 - The bot reads the same tables as the app and uses `format_money` (NFR-20).
 - It adds 3 small tables (`bot/models.py`): **Gulnaz must add them to the migrations**.
-- Run tests: `python -m pytest tests/test_bot_alerts.py`
+- Run tests: `python -m pytest test_bot_alerts.py`
