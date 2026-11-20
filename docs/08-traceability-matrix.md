@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Document owner** | Nuray Mukhambet — Systems Analysis & Requirements |
-| **Version** | 1.3 |
-| **Date** | 2026-11-13 |
+| **Version** | 1.4 |
+| **Date** | 2026-11-20 |
 
 The matrix links every requirement to the use case and user story it comes from, the business rules and data it depends on, the team member who implements it and the test that verifies it. **Test case IDs are reserved here; the Testing role fills in the test details and the Status column.**
 
@@ -12,11 +12,13 @@ The matrix links every requirement to the use case and user story it comes from,
 
 | Member | Role | Abbreviation in matrix |
 |---|---|---|
-| Nuray Mukhambet | Systems Analysis & Requirements | **SA** |
+| Nuray Mukhambet | Systems Analysis & Requirements; Frontend (web app) | **SA** |
 | Nuradin Alinur | Architecture & Security | **AS** |
 | Gulnaz Bekturgan | Data & Database | **DB** |
 | Daniyarbekov Kairat | Testing, Analytics & Integration | **TI** |
-| Myrzakhanova Aziza | Application & Development | **AD** |
+| Myrzakhanova Aziza | Application & Development (backend) | **AD** |
+
+**Frontend:** Nuray Mukhambet (SA) built the web app in `frontend/`, the screens for every requirement in this matrix. Where "Implemented by" does not name SA, it lists who builds the server side; the screens are always SA (frontend).
 
 ## Functional requirements
 
@@ -60,10 +62,10 @@ The matrix links every requirement to the use case and user story it comes from,
 | FR-37 | Audit log | S | UC-06 | US-11 | BR-27 | AUDIT_LOG | AS, DB | TC-37 | ⬜ |
 | FR-38 | View audit log | C | — | US-26 | BR-27 | AUDIT_LOG | AD | TC-38 | ⬜ |
 | FR-39 | Block / unblock user | S | UC-12 | US-20 | — | USER, AUDIT_LOG | AD, AS | TC-39 | ⬜ |
-| FR-43 | Achievement badges | S | — | US-27 | BR-12, BR-13, BR-29, BR-30 | TRANSACTION, BUDGET, SAVINGS_GOAL | SA (web app), AD | TC-43 | 🟨 |
-| FR-44 | Savings-goal milestones | S | UC-10 | US-27 | BR-25, BR-29, BR-30 | SAVINGS_GOAL, ACCOUNT | SA (web app), AD | TC-44 | 🟨 |
-| FR-45 | Points and levels | S | — | US-28 | BR-29, BR-31 | TRANSACTION, BUDGET, SAVINGS_GOAL | SA (web app), AD | TC-45 | 🟨 |
-| FR-46 | Kids' savings challenge | S | — | US-29 | BR-10, BR-25, BR-32 | SAVINGS_CHALLENGE, ACCOUNT, ACCOUNT_ACCESS, NOTIFICATION | SA (web app), AD, DB | TC-46 | 🟨 |
+| FR-43 | Achievement badges | S | — | US-27 | BR-12, BR-13, BR-29, BR-30 | TRANSACTION, BUDGET, SAVINGS_GOAL | SA (frontend), AD | TC-43 | 🟨 |
+| FR-44 | Savings-goal milestones | S | UC-10 | US-27 | BR-25, BR-29, BR-30 | SAVINGS_GOAL, ACCOUNT | SA (frontend), AD | TC-44 | 🟨 |
+| FR-45 | Points and levels | S | — | US-28 | BR-29, BR-31 | TRANSACTION, BUDGET, SAVINGS_GOAL | SA (frontend), AD | TC-45 | 🟨 |
+| FR-46 | Kids' savings challenge | S | — | US-29 | BR-10, BR-25, BR-32 | SAVINGS_CHALLENGE, ACCOUNT, ACCOUNT_ACCESS, NOTIFICATION | SA (frontend), AD, DB | TC-46 | 🟨 |
 
 ## Non-functional requirements
 

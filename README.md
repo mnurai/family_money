@@ -22,11 +22,11 @@ Team project for the course **Basics of Information Systems**.
 
 | Member | Role | Main responsibilities |
 |---|---|---|
-| Nuray Mukhambet | Systems Analysis & Requirements | Vision and scope, requirements, use cases, user stories, business rules, data dictionary, diagrams, traceability |
+| Nuray Mukhambet | Systems Analysis & Requirements; Frontend | Vision and scope, requirements, use cases, user stories, business rules, data dictionary, diagrams, traceability; the web app (`frontend/`): all screens, demo API, gamification |
 | Nuradin Alinur | Architecture & Security | System architecture, technology stack, authentication, role-based access control |
 | Gulnaz Bekturgan | Data & Database | Database design and implementation (PostgreSQL), migrations, seed data |
 | Daniyarbekov Kairat | Testing, Analytics & Integration | Test cases, automated tests, reports and analytics, integration |
-| Myrzakhanova Aziza | Application & Development | Backend and frontend implementation of the features |
+| Myrzakhanova Aziza | Application & Development | Backend implementation of the features (API) |
 
 ## Documentation
 
