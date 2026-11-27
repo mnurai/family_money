@@ -11,6 +11,7 @@ import { GoalsPage } from './pages/Goals';
 import { MembersPage } from './pages/Members';
 import { InviteLinkPage, WelcomePage } from './pages/Onboarding';
 import { ReportsPage } from './pages/Reports';
+import { TelegramPage } from './pages/Telegram';
 import { TransactionsPage } from './pages/Transactions';
 import { useSession } from './state/session';
 import type { MemberRole } from './api';
@@ -54,6 +55,7 @@ export function App() {
         <Route path="achievements" element={<AchievementsPage />} />
         <Route path="members" element={<MembersPage />} />
         <Route path="audit" element={<RequireRole roles={['OWNER']}><AuditPage /></RequireRole>} />
+        <Route path="telegram" element={<RequireRole roles={['OWNER']}><TelegramPage /></RequireRole>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
