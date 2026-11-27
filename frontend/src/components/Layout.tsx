@@ -10,6 +10,7 @@ import {
   LogOut,
   Plus,
   RotateCcw,
+  Send,
   Target,
   Trophy,
   Users,
@@ -42,6 +43,7 @@ export function Layout() {
     { to: '/achievements', label: 'Achievements', icon: Trophy, show: true },
     { to: '/members', label: 'Family', icon: Users, show: true },
     { to: '/audit', label: 'Audit log', icon: History, show: isOwner },
+    { to: '/telegram', label: 'Telegram', icon: Send, show: isOwner },
   ].filter((n) => n.show);
   const mobileNav = nav.filter((n) => ['/', '/transactions', '/accounts', isGrownUp ? '/budgets' : '/members', '/reports'].includes(n.to));
   const current = nav.find((n) => (n.to === '/' ? location.pathname === '/' : location.pathname.startsWith(n.to)));
